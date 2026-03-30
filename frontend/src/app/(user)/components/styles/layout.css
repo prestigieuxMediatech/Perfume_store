@@ -112,7 +112,8 @@
             gap: 1.5rem;
           }
 
-          .site-icons button {
+          .site-icons button,
+          .site-icons a {
             background: none;
             border: none;
             cursor: pointer;
@@ -122,9 +123,11 @@
             justify-content: center;
             padding: 4px;
             transition: color 0.3s, transform 0.3s;
+            text-decoration: none;
           }
 
-          .site-icons button:hover {
+          .site-icons button:hover,
+          .site-icons a:hover {
             color: var(--gold-light);
             transform: scale(1.15);
           }

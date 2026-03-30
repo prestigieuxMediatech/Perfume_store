@@ -1,5 +1,11 @@
 "use client";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import { useCart } from "../context/CartContext";
+import { useAuth } from "../context/AuthContext";
+import SizeSelector from "./SizeSelector";
+
+const BASE = process.env.NEXT_PUBLIC_API_URL;
 
 const Keyframes = () => (
   <style>{`
@@ -238,6 +244,7 @@ const Keyframes = () => (
       transition: background 0.3s;
     }
     .btn-quick-add:hover { background: #e8c97a; }
+    .btn-quick-add:disabled { opacity: .6; cursor: not-allowed; }
 
     .btn-wishlist {
       width: 38px;
@@ -328,6 +335,16 @@ const Keyframes = () => (
       text-transform: uppercase;
       color: rgba(245,240,232,0.25);
     }
+
+    .prod-cart-msg {
+      margin-top: 0.8rem;
+      font-family: 'Cinzel', serif;
+      font-size: 0.5rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+    }
+    .prod-cart-msg.success { color: #2AE880; }
+    .prod-cart-msg.error { color: #E8472A; }
 
     /* ── Rating dots ── */
     .prod-rating {
@@ -550,7 +567,53 @@ function useReveal(selector) {
 
 export default function Products() {
   const [activeTab, setActiveTab] = React.useState("All");
+  const { user } = useAuth();
+  const { addItem } = useCart();
+  const [addingId, setAddingId] = useState(null);
+  const [cartFeedback, setCartFeedback] = useState({ id: null, type: "", text: "" });
+  const [selectorProduct, setSelectorProduct] = useState(null);
   useReveal(".prod-reveal");
+
+  const showCartFeedback = (id, type, text) => {
+    setCartFeedback({ id, type, text });
+    setTimeout(() => setCartFeedback({ id: null, type: "", text: "" }), 2200);
+  };
+
+  const handleQuickAdd = async (productId) => {
+    if (!user) {
+      alert("Please login first");
+      return;
+    }
+    setAddingId(productId);
+    try {
+      const res = await axios.get(`${BASE}/api/products/${productId}`);
+      const product = res.data;
+      const variants = product?.variants || [];
+
+      if (variants.length === 0) {
+        showCartFeedback(productId, "error", "No sizes available");
+        return;
+      }
+
+      if (variants.length > 1) {
+        setSelectorProduct(product);
+        return;
+      }
+
+      const addRes = await addItem({
+        product_id: product.id,
+        variant_id: variants[0].id,
+        quantity: 1,
+      });
+
+      if (addRes.ok) showCartFeedback(productId, "success", "Added to cart");
+      else showCartFeedback(productId, "error", addRes.message || "Could not add");
+    } catch (err) {
+      showCartFeedback(productId, "error", "Could not load sizes");
+    } finally {
+      setAddingId(null);
+    }
+  };
 
   return (
     <>
@@ -588,7 +651,13 @@ export default function Products() {
 
                   {/* Hover overlay */}
                   <div className="prod-overlay">
-                    <button className="btn-quick-add">Add to Cart</button>
+                    <button
+                      className="btn-quick-add"
+                      onClick={() => handleQuickAdd(p.id)}
+                      disabled={addingId === p.id}
+                    >
+                      {addingId === p.id ? "Adding..." : "Add to Cart"}
+                    </button>
                     <button className="btn-wishlist" aria-label="Wishlist">
                       <IconHeart />
                     </button>
@@ -607,6 +676,11 @@ export default function Products() {
                       <span className="prod-size">{p.size}</span>
                     </div>
                   </div>
+                  {cartFeedback.id === p.id && (
+                    <div className={`prod-cart-msg ${cartFeedback.type}`}>
+                      {cartFeedback.text}
+                    </div>
+                  )}
                 </div>
               </div>
             ))}
@@ -627,6 +701,14 @@ export default function Products() {
 
         </div>
       </section>
+
+      {selectorProduct && (
+        <SizeSelector
+          product={selectorProduct}
+          onClose={() => setSelectorProduct(null)}
+          onAuthRequired={() => alert("Please login first")}
+        />
+      )}
     </>
   );
 }

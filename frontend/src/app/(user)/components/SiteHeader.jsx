@@ -4,8 +4,9 @@ import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { useState } from "react";
 import { Heart, ShoppingCart, User, LogOut, ChevronDown } from "lucide-react";
-import { useAuth } from "@/context/AuthContext";
-import AuthModal from "@/components/AuthModal";
+import { useAuth } from "../context/AuthContext";
+import { useCart } from "../context/CartContext";
+import AuthModal from "./AuthModal";
 import "./styles/layout.css";
 
 // Letter avatar component
@@ -44,6 +45,7 @@ export default function SiteHeader() {
   const [modalOpen, setModalOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const { user, logout }          = useAuth();
+  const { count }                 = useCart();
 
   const isActive = (path) => (pathname === path ? "active" : "");
 
@@ -73,14 +75,19 @@ export default function SiteHeader() {
         <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
           <div className="site-icons">
 
-            <button aria-label="Wishlist">
+            <Link href="/wishlist" aria-label="Wishlist">
               <Heart size={18} strokeWidth={1.5} />
-            </button>
+            </Link>
 
             <div className="icon-wrap">
-              <button aria-label="Cart">
+              <Link href="/cart" aria-label="Cart">
                 <ShoppingCart size={18} strokeWidth={1.5} />
-              </button>
+              </Link>
+              {count > 0 && (
+                <span className="cart-badge">
+                  {count > 9 ? "9+" : count}
+                </span>
+              )}
             </div>
 
             <div style={{ position: "relative" }}>
