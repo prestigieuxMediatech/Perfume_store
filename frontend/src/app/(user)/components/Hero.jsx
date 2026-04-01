@@ -1,84 +1,70 @@
-"use client";
-import React, { useEffect, useRef, useState } from "react";
+﻿"use client";
+import React, { useEffect, useState } from "react";
 
-// Inject Google Fonts + keyframe animations via a style tag
+const HERO_PRODUCTS = [
+  {
+    id: 1,
+    family: "Floral · Oriental",
+    name: "Velours Noir",
+    notes: "Black rose, oud, amber & dark vanilla",
+    price: "₹18,500",
+    img: "/one.webp",
+  },
+  {
+    id: 2,
+    family: "Woody · Spiced",
+    name: "Santal Impérial",
+    notes: "Mysore sandalwood, cardamom & leather",
+    price: "₹22,000",
+    img: "/two.jpg",
+  },
+  {
+    id: 3,
+    family: "Aquatic · Fresh",
+    name: "Brume d'Aube",
+    notes: "Sea salt, iris, white cedar & musk",
+    price: "₹15,800",
+    img: "/three.jpg",
+  },
+  {
+    id: 4,
+    family: "Gourmand · Warm",
+    name: "Or Épicé",
+    notes: "Saffron, tonka bean, honey & vetiver",
+    price: "₹26,500",
+    img: "/four.webp",
+  },
+];
+
+const chunk = (items, size) => {
+  const result = [];
+  for (let i = 0; i < items.length; i += size) {
+    result.push(items.slice(i, i + size));
+  }
+  return result;
+};
+
 const GlobalStyles = () => (
   <style>{`
-    @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Cinzel:wght@300;400;500&family=Cormorant:ital,wght@0,300;1,300&display=swap');
-
-    :root {
-      --gold: #c9a84c;
-      --gold-light: #e8c97a;
-      --gold-glow: rgba(201,168,76,0.18);
-      --cream: #f5f0e8;
-      --dark: #080808;
-      --dark2: #111;
-      --text-muted: rgba(245,240,232,0.45);
-    }
-
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-
-    body { background: var(--dark); }
-
-    /* ── Floating perfume bottle ── */
-    @keyframes float {
-      0%, 100% { transform: translateY(0px) rotate(-1deg); }
-      50%       { transform: translateY(-22px) rotate(1deg); }
-    }
-
-    /* ── Slow pulse glow ── */
-    @keyframes glowPulse {
-      0%, 100% { opacity: 0.35; transform: scale(1); }
-      50%       { opacity: 0.65; transform: scale(1.15); }
-    }
-
-    /* ── Orbit ring spin ── */
-    @keyframes orbitSpin {
-      from { transform: rotate(0deg); }
-      to   { transform: rotate(360deg); }
-    }
-
-    /* ── Orbit dot counter-spin so dot stays stationary in place ── */
-    @keyframes dotCounter {
-      from { transform: rotate(0deg); }
-      to   { transform: rotate(-360deg); }
-    }
-
-    /* ── Fade + rise entrance ── */
+    /* €€ Fade + rise entrance €€ */
     @keyframes fadeRise {
       from { opacity: 0; transform: translateY(32px); }
       to   { opacity: 1; transform: translateY(0); }
     }
 
-    /* ── Shimmer line ── */
+    /* €€ Shimmer line €€ */
     @keyframes shimmer {
       0%   { background-position: -400px 0; }
       100% { background-position: 400px 0; }
     }
 
-    /* ── Particle drift ── */
-    @keyframes particleDrift {
-      0%   { transform: translateY(0)   translateX(0)   opacity(0); opacity: 0; }
-      20%  { opacity: 0.6; }
-      80%  { opacity: 0.3; }
-      100% { transform: translateY(-180px) translateX(30px); opacity: 0; }
-    }
-
-    @keyframes particleDrift2 {
-      0%   { transform: translateY(0) translateX(0); opacity: 0; }
-      20%  { opacity: 0.5; }
-      80%  { opacity: 0.2; }
-      100% { transform: translateY(-220px) translateX(-40px); opacity: 0; }
-    }
-
-    /* ── Line draw ── */
+    /* €€ Line draw €€ */
     @keyframes lineDraw {
       from { width: 0; opacity: 0; }
       to   { width: 60px; opacity: 1; }
     }
 
     .hero-section {
-      /* Avoid oversized empty space on tall desktop screens */
       min-height: clamp(640px, 92vh, 920px);
       padding: 6rem 4rem 3.5rem;
       background: var(--dark);
@@ -89,7 +75,6 @@ const GlobalStyles = () => (
       position: relative;
     }
 
-    /* subtle grain overlay */
     .hero-section::before {
       content: '';
       position: absolute;
@@ -110,7 +95,6 @@ const GlobalStyles = () => (
       z-index: 1;
     }
 
-    /* ── LEFT ── */
     .hero-left { display: flex; flex-direction: column; gap: 2rem; }
 
     .hero-eyebrow {
@@ -165,10 +149,10 @@ const GlobalStyles = () => (
     .hero-sub {
       font-family: 'Cormorant Garamond', serif;
       font-style: italic;
-      font-weight: 300;
+      font-weight: 550;
       font-size: 1.05rem;
       line-height: 1.75;
-      color: var(--text-muted);
+      color: var(--cream);
       max-width: 380px;
       border-left: 1px solid rgba(201,168,76,0.3);
       padding-left: 1.25rem;
@@ -184,56 +168,11 @@ const GlobalStyles = () => (
       animation-delay: 0.7s;
     }
 
-    .btn-primary {
-      font-family: 'Cinzel', serif;
-      font-size: 0.65rem;
-      letter-spacing: 0.3em;
-      text-transform: uppercase;
-      color: black;
-      font-weight: bold;
-      background: var(--gold);
-      border: none;
-      padding: 0.95rem 2rem;
-      cursor: pointer;
-      position: relative;
-      overflow: hidden;
-      transition: color 0.35s;
-    }
-
-    .btn-primary::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(110deg, transparent 30%, rgba(255,255,255,0.25) 50%, transparent 70%);
-      background-size: 400px 100%;
-      transform: translateX(-100%);
-      transition: transform 0.6s ease;
-    }
-
-    .btn-primary:hover::after { transform: translateX(100%); }
-    .btn-primary:hover { background: var(--gold-light); }
-
-    .btn-ghost {
-      font-family: 'Cinzel', serif;
-      font-size: 0.62rem;
-      letter-spacing: 0.3em;
-      text-transform: uppercase;
-      color: var(--text-muted);
-      background: none;
-      border: none;
-      cursor: pointer;
-      transition: color 0.3s;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-    .btn-ghost:hover { color: var(--gold-light); }
-
     .hero-metrics {
       display: flex;
       gap: 2.5rem;
       padding-top: 2rem;
-      border-top: 1px solid rgba(245,240,232,0.08);
+      border-top: 1px solid var(--border);
       animation: fadeRise 0.9s ease both;
       animation-delay: 0.9s;
     }
@@ -255,7 +194,6 @@ const GlobalStyles = () => (
       margin-top: 0.35rem;
     }
 
-    /* ── RIGHT IMAGE SHELL ── */
     .hero-right {
       position: relative;
       display: flex;
@@ -265,100 +203,124 @@ const GlobalStyles = () => (
       animation-delay: 0.4s;
     }
 
-    /* Background radial gradient atmosphere */
-    .hero-atmosphere {
+    .hero-carousel {
+      width: 100%;
+      max-width: 540px;
+      border: 1px solid var(--border);
+      background: var(--dark2);
+      padding: 1.5rem;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 24px 60px rgba(0,0,0,0.35);
+    }
+
+    .hero-carousel::before {
+      content: '';
       position: absolute;
-      width: 500px;
-      height: 500px;
-      background: radial-gradient(ellipse at center, rgba(201,168,76,0.12) 0%, transparent 70%);
-      animation: glowPulse 4s ease-in-out infinite;
-    }
-
-    /* Orbit ring 1 */
-    .orbit-ring {
-      position: absolute;
-      border-radius: 50%;
-      border: 1px solid rgba(201,168,76,0.15);
-    }
-
-    .orbit-ring--1 {
-      width: 420px; height: 420px;
-      animation: orbitSpin 18s linear infinite;
-    }
-
-    .orbit-ring--2 {
-      width: 320px; height: 320px;
-      animation: orbitSpin 12s linear infinite reverse;
-      border-style: dashed;
-      border-color: rgba(201,168,76,0.1);
-    }
-
-    .orbit-dot {
-      position: absolute;
-      width: 6px; height: 6px;
-      border-radius: 50%;
-      background: var(--gold);
-      top: -3px; left: 50%;
-      transform: translateX(-50%);
-      animation: dotCounter 18s linear infinite;
-    }
-
-    .orbit-dot--2 {
-      width: 4px; height: 4px;
-      top: auto; bottom: -2px;
-      background: var(--gold-light);
-      animation: dotCounter 12s linear infinite reverse;
-    }
-
-    /* Particles */
-    .particle {
-      position: absolute;
-      width: 3px; height: 3px;
-      border-radius: 50%;
-      background: var(--gold);
+      inset: 0;
+      background: radial-gradient(circle at 0% 0%, rgba(201,168,76,0.14), transparent 55%);
       pointer-events: none;
     }
 
-    .p1 { bottom: 30%; left: 15%; animation: particleDrift  5s ease-in-out infinite; }
-    .p2 { bottom: 20%; right: 18%; animation: particleDrift2 6.5s ease-in-out infinite 1s; }
-    .p3 { bottom: 40%; left: 25%; animation: particleDrift  7s ease-in-out infinite 2s; width: 2px; height: 2px; }
-    .p4 { bottom: 25%; right: 30%; animation: particleDrift2 5.5s ease-in-out infinite 0.5s; width: 2px; height: 2px; }
-
-    .hero-bottle {
+    .hero-carousel-viewport {
+      overflow: hidden;
       position: relative;
-      z-index: 2;
-      width: clamp(280px, 38vw, 480px);
-      animation: float 6s ease-in-out infinite;
-      filter: drop-shadow(0 30px 60px rgba(201,168,76,0.2));
+      z-index: 1;
     }
 
-    /* Corner decorative marks */
-    .corner-mark {
-      position: absolute;
-      width: 28px; height: 28px;
-      border-color: rgba(201,168,76,0.35);
-      border-style: solid;
+    .hero-carousel-track {
+      display: flex;
+      transition: transform 0.7s ease;
+      gap: 1.2rem;
     }
-    .corner-mark--tl { top: 10%; left: 8%; border-width: 1px 0 0 1px; }
-    .corner-mark--tr { top: 10%; right: 8%; border-width: 1px 1px 0 0; }
-    .corner-mark--bl { bottom: 10%; left: 8%; border-width: 0 0 1px 1px; }
-    .corner-mark--br { bottom: 10%; right: 8%; border-width: 0 1px 1px 0; }
 
-    /* Vertical text label */
-    .vertical-label {
-      position: absolute;
-      right: -2rem;
-      top: 50%;
-      transform: translateY(-50%) rotate(90deg);
+    .hero-slide {
+      min-width: 100%;
+    }
+
+    .hero-slide-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1.2rem;
+    }
+
+    .hero-card {
+      background: var(--dark3);
+      border: 1px solid var(--border);
+      overflow: hidden;
+    }
+
+    .hero-card-img {
+      aspect-ratio: 3/4;
+      overflow: hidden;
+      background: var(--dark3);
+    }
+
+    .hero-card-img img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .hero-card-body {
+      padding: 0.9rem 0.9rem 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+    }
+
+    .hero-card-family {
       font-family: 'Cinzel', serif;
-      font-size: 0.5rem;
-      letter-spacing: 0.4em;
-      color: rgba(201,168,76,0.4);
+      font-size: 0.45rem;
+      letter-spacing: 0.25em;
       text-transform: uppercase;
-      white-space: nowrap;
+      color: rgba(201,168,76,0.7);
     }
 
-    /* ── Responsive ── */
+    .hero-card-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1rem;
+      color: var(--cream);
+      letter-spacing: 0.02em;
+    }
+
+    .hero-card-notes {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      line-height: 1.4;
+    }
+
+    .hero-card-price {
+      font-family: 'Cinzel', serif;
+      font-size: 0.65rem;
+      letter-spacing: 0.18em;
+      color: var(--gold);
+      margin-top: 0.2rem;
+    }
+
+    .hero-dots {
+      display: flex;
+      gap: 6px;
+      margin-top: 1rem;
+      justify-content: center;
+    }
+
+    .hero-dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 999px;
+      background: rgba(var(--text-rgb),0.2);
+      transition: width 0.35s ease, background 0.35s ease;
+    }
+
+    .hero-dot.active {
+      width: 22px;
+      background: var(--gold);
+    }
+
     @media (min-width: 1024px) {
       .hero-section {
         min-height: clamp(640px, 86vh, 880px);
@@ -370,8 +332,7 @@ const GlobalStyles = () => (
       .hero-section { padding: 5rem 1.5rem 3rem; }
       .hero-grid { grid-template-columns: 1fr; }
       .hero-right { margin-top: 2rem; }
-      .vertical-label { display: none; }
-      .corner-mark { display: none; }
+      .hero-slide-grid { grid-template-columns: 1fr; }
     }
 
     @media (prefers-reduced-motion: reduce) {
@@ -385,15 +346,24 @@ const GlobalStyles = () => (
   `}</style>
 );
 
-function Hero() {
+export default function Hero() {
+  const slides = chunk(HERO_PRODUCTS, 2);
+  const [index, setIndex] = useState(0);
+
+  useEffect(() => {
+    if (slides.length <= 1) return undefined;
+    const id = setInterval(() => {
+      setIndex((prev) => (prev + 1) % slides.length);
+    }, 3500);
+    return () => clearInterval(id);
+  }, [slides.length]);
+
   return (
     <>
       <GlobalStyles />
       <section className="hero-section">
         <div className="hero-grid">
-
           <div className="hero-left">
-
             <div className="hero-eyebrow">
               Maison de Parfum · Est. 1987
             </div>
@@ -414,11 +384,9 @@ function Hero() {
 
             <div className="hero-cta">
               <button className="btn-primary">
-                Explore Collection →
+                Explore Collection 
               </button>
-              <button className="btn-ghost">
-                Our Story →
-              </button>
+              
             </div>
 
             <div className="hero-metrics">
@@ -435,46 +403,48 @@ function Hero() {
                 <div className="metric-label">Rare Ingredients</div>
               </div>
             </div>
-
           </div>
 
           <div className="hero-right">
-
-            <div className="corner-mark corner-mark--tl" />
-            <div className="corner-mark corner-mark--tr" />
-            <div className="corner-mark corner-mark--bl" />
-            <div className="corner-mark corner-mark--br" />
-
-            <div className="hero-atmosphere" />
-
-            <div className="orbit-ring orbit-ring--1">
-              <span className="orbit-dot" />
+            <div className="hero-carousel">
+              <div className="hero-carousel-viewport">
+                <div
+                  className="hero-carousel-track"
+                  style={{ transform: `translateX(-${index * 100}%)` }}
+                >
+                  {slides.map((group, slideIndex) => (
+                    <div className="hero-slide" key={`slide-${slideIndex}`}>
+                      <div className="hero-slide-grid">
+                        {group.map((item) => (
+                          <div className="hero-card" key={item.id}>
+                            <div className="hero-card-img">
+                              <img src={item.img} alt={item.name} />
+                            </div>
+                            <div className="hero-card-body">
+                              <div className="hero-card-family">{item.family}</div>
+                              <div className="hero-card-name">{item.name}</div>
+                              <div className="hero-card-notes">{item.notes}</div>
+                              <div className="hero-card-price">{item.price}</div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <div className="hero-dots">
+                {slides.map((_, dotIndex) => (
+                  <span
+                    key={`dot-${dotIndex}`}
+                    className={`hero-dot ${dotIndex === index ? "active" : ""}`}
+                  />
+                ))}
+              </div>
             </div>
-            <div className="orbit-ring orbit-ring--2">
-              <span className="orbit-dot orbit-dot--2" />
-            </div>
-
-            {/* Floating particles */}
-            <span className="particle p1" />
-            <span className="particle p2" />
-            <span className="particle p3" />
-            <span className="particle p4" />
-
-            {/* Bottle */}
-            <img
-              src="/bg.png"
-              alt="Perfume Bottle"
-              className="hero-bottle"
-            />
-
-            <span className="vertical-label">Eau de Parfum · 50ml</span>
-
           </div>
-
         </div>
       </section>
     </>
   );
 }
-
-export default Hero;

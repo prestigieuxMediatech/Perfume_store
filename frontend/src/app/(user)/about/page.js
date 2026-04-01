@@ -3,22 +3,7 @@ import { useEffect } from 'react';
 import Image from 'next/image';
 
 const Styles = () => (
-  <style>{`
-    @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Cinzel:wght@300;400;500&display=swap');
-
-    :root {
-      --gold:   #c9a84c;
-      --goldL:  #e8c97a;
-      --cream:  #f5f0e8;
-      --dark:   #080808;
-      --dark2:  #0d0d0e;
-      --dark3:  #111113;
-      --muted:  rgba(245,240,232,0.42);
-      --border: rgba(245,240,232,0.07);
-      --goldB:  rgba(201,168,76,0.18);
-    }
-
-    @keyframes fadeUp  { from{opacity:0;transform:translateY(32px)} to{opacity:1;transform:translateY(0)} }
+  <style>{`\n@keyframes fadeUp  { from{opacity:0;transform:translateY(32px)} to{opacity:1;transform:translateY(0)} }
     @keyframes fadeIn  { from{opacity:0} to{opacity:1} }
     @keyframes drawH   { from{width:0;opacity:0} to{width:36px;opacity:1} }
     @keyframes pulse   { 0%,100%{opacity:.22;transform:scale(1)} 50%{opacity:.45;transform:scale(1.12)} }
@@ -201,9 +186,9 @@ const Styles = () => (
 
     .ah-story-body {
       font-size:1.05rem; font-weight:300; line-height:1.95;
-      color:rgba(245,240,232,.58);
+      color:var(--text-subtle);
     }
-    .ah-story-body strong { font-weight:400; color:rgba(245,240,232,.85); }
+    .ah-story-body strong { font-weight:400; color:var(--text-strong); }
 
     .ah-pillars {
       display:grid; grid-template-columns:repeat(3,1fr);
@@ -289,7 +274,7 @@ const Styles = () => (
     }
     .ah-phil-quote-text {
       font-style:italic; font-size:1.12rem;
-      line-height:1.88; color:rgba(245,240,232,.72);
+      line-height:1.88; color:var(--text-subtle);
     }
     .ah-phil-cite {
       display:block; margin-top:1.25rem;
@@ -760,3 +745,4 @@ export default function AboutPage() {
     </div>
   );
 }
+

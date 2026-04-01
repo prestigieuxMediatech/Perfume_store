@@ -86,9 +86,17 @@ exports.createCategory = async(req,res) => {
 }
 exports.getCategories = async (req, res) => {
   try {
-    const [rows] = await pool.query(
-      `SELECT * FROM categories ORDER BY created_at DESC`
-    );
+    const [rows] = await pool.query(`
+      SELECT
+        c.*,
+        COUNT(DISTINCT p.id) AS product_count,
+        COUNT(DISTINCT b.id) AS brand_count
+      FROM categories c
+      LEFT JOIN products p ON p.category_id = c.id
+      LEFT JOIN brands b   ON b.category_id = c.id
+      GROUP BY c.id
+      ORDER BY c.created_at DESC
+    `);
     res.status(200).json(rows);
   } catch (err) {
     console.error(err);

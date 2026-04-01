@@ -3,9 +3,10 @@
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { useState } from "react";
-import { Heart, ShoppingCart, User, LogOut, ChevronDown } from "lucide-react";
+import { Heart, ShoppingCart, User, LogOut, ChevronDown, Moon, Sun } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import { useCart } from "../context/CartContext";
+import { useTheme } from "../context/ThemeContext";
 import AuthModal from "./AuthModal";
 import "./styles/layout.css";
 
@@ -46,6 +47,7 @@ export default function SiteHeader() {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const { user, logout }          = useAuth();
   const { count }                 = useCart();
+  const { theme, toggleTheme }    = useTheme();
 
   const isActive = (path) => (pathname === path ? "active" : "");
 
@@ -72,7 +74,7 @@ export default function SiteHeader() {
           </ul>
         </nav>
 
-        <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
+        <div className="header-actions">
           <div className="site-icons">
 
             <Link href="/wishlist" aria-label="Wishlist">
@@ -90,24 +92,16 @@ export default function SiteHeader() {
               )}
             </div>
 
-            <div style={{ position: "relative" }}>
+            <div className="user-menu">
               <button
                 aria-label="Account"
                 onClick={handleUserClick}
-                style={{
-                  display:    "flex",
-                  alignItems: "center",
-                  gap:        "5px",
-                  background: "transparent",
-                  border:     "none",
-                  cursor:     "pointer",
-                  padding:    0,
-                }}
+                className="user-button"
               >
                 {user ? (
                   <>
                     <Avatar name={user.name} size={28} />
-                    <ChevronDown size={12} strokeWidth={1.5} color="#7A7264" />
+                    <ChevronDown size={12} strokeWidth={1.5} color="var(--text-muted)" />
                   </>
                 ) : (
                   <User size={18} strokeWidth={1.5} />
@@ -148,6 +142,18 @@ export default function SiteHeader() {
           </div>
 
           <button
+            className="theme-toggle"
+            aria-label="Toggle theme"
+            onClick={toggleTheme}
+          >
+            {theme === "dark" ? (
+              <Sun size={16} strokeWidth={1.5} />
+            ) : (
+              <Moon size={16} strokeWidth={1.5} />
+            )}
+          </button>
+
+          <button
             className={`hamburger ${menuOpen ? "open" : ""}`}
             aria-label="Toggle menu"
             onClick={() => setMenuOpen(!menuOpen)}
@@ -163,6 +169,26 @@ export default function SiteHeader() {
         <Link href="/about"   className={isActive("/about")}   onClick={() => setMenuOpen(false)}>About</Link>
         <Link href="/shop"    className={isActive("/shop")}    onClick={() => setMenuOpen(false)}>Shop</Link>
         <Link href="/contact" className={isActive("/contact")} onClick={() => setMenuOpen(false)}>Contact</Link>
+        <button
+          className="mobile-theme-toggle"
+          aria-label="Toggle theme"
+          onClick={() => {
+            toggleTheme();
+            setMenuOpen(false);
+          }}
+        >
+          {theme === "dark" ? (
+            <>
+              <Sun size={16} strokeWidth={1.5} />
+              Light mode
+            </>
+          ) : (
+            <>
+              <Moon size={16} strokeWidth={1.5} />
+              Dark mode
+            </>
+          )}
+        </button>
       </nav>
 
       {modalOpen && <AuthModal onClose={() => setModalOpen(false)} />}

@@ -254,6 +254,53 @@ exports.getAdminOrders = async (req, res) => {
   }
 };
 
+exports.getAdminOrderById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const [orders] = await pool.query(`
+      SELECT
+        o.*,
+        o.grand_total AS total_amount,
+        u.name  AS user_name,
+        u.email AS user_email
+      FROM orders o
+      JOIN users u ON o.user_id = u.id
+      WHERE o.id = ?
+    `, [id]);
+
+    if (orders.length === 0) {
+      return res.status(404).json({ message: 'Order not found' });
+    }
+
+    const [items] = await pool.query(`
+      SELECT
+        od.id,
+        od.quantity,
+        od.unit_price,
+        od.discount_price,
+        od.line_total,
+        p.name AS product_name,
+        pv.size AS size,
+        pi.image_url AS image
+      FROM order_details od
+      JOIN products p ON od.product_id = p.id
+      LEFT JOIN product_variants pv ON od.variant_id = pv.id
+      LEFT JOIN product_images pi
+        ON p.id = pi.product_id AND pi.is_primary = TRUE
+      WHERE od.order_id = ?
+      ORDER BY od.id ASC
+    `, [id]);
+
+    res.status(200).json({
+      ...orders[0],
+      items
+    });
+  } catch (err) {
+    console.error('Admin order detail error:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
 exports.updateOrderStatus = async (req, res) => {
   try {
     const { id } = req.params;

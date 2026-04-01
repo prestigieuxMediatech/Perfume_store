@@ -143,6 +143,7 @@ export default function Categories() {
       </div>
 
       {/* Table */}
+      <div className="ad-table-wrap">
       <table className="ad-table">
         <thead>
           <tr>
@@ -150,6 +151,7 @@ export default function Categories() {
             <th>Name</th>
             <th>Slug</th>
             <th>Products</th>
+            <th>Brands</th>
             <th>Created</th>
             <th>Actions</th>
           </tr>
@@ -157,13 +159,13 @@ export default function Categories() {
         <tbody>
           {loading ? (
             <tr>
-              <td colSpan={6} style={{ textAlign:"center", color:"#7A7264", padding:"2rem" }}>
+              <td colSpan={7} style={{ textAlign:"center", color:"#7A7264", padding:"2rem" }}>
                 Loading...
               </td>
             </tr>
           ) : categories.length === 0 ? (
             <tr>
-              <td colSpan={6} style={{ textAlign:"center", color:"#7A7264", padding:"2rem" }}>
+              <td colSpan={7} style={{ textAlign:"center", color:"#7A7264", padding:"2rem" }}>
                 No categories yet — add your first one
               </td>
             </tr>
@@ -173,6 +175,7 @@ export default function Categories() {
               <td>{cat.name}</td>
               <td style={{ color:"#7A7264", fontSize:"0.68rem" }}>{cat.slug}</td>
               <td>{cat.product_count ?? 0}</td>
+              <td>{cat.brand_count ?? 0}</td>
               <td style={{ color:"#7A7264" }}>
                 {new Date(cat.created_at).toLocaleDateString("en-IN")}
               </td>
@@ -200,6 +203,7 @@ export default function Categories() {
           ))}
         </tbody>
       </table>
+      </div>
 
       {/* Modal */}
       {modalOpen && (

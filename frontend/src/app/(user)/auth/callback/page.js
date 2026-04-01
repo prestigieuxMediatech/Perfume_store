@@ -59,7 +59,7 @@ export default function AuthCallback() {
         height:       40,
         borderRadius: "50%",
         border:       "2px solid #2a2418",
-        borderTop:    "2px solid #C9A84C",
+        borderTop:    "2px solid var(--gold)",
         animation:    "spin 0.8s linear infinite",
       }} />
       <p style={{

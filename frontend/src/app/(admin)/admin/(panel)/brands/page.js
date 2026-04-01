@@ -155,6 +155,7 @@ export default function Brands() {
       </div>
 
       {/* Table */}
+      <div className="ad-table-wrap">
       <table className="ad-table">
         <thead>
           <tr>
@@ -214,6 +215,7 @@ export default function Brands() {
           ))}
         </tbody>
       </table>
+      </div>
 
       {/* Modal */}
       {modalOpen && (

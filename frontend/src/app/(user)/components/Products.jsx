@@ -30,8 +30,8 @@ const Keyframes = () => (
     /* ── Section ── */
     .products-section {
       position: relative;
-      background: #080808;
-      color: #f5f0e8;
+      background: var(--dark);
+      color: var(--cream);
       /* Tighter top padding so the gap after About feels balanced on desktop */
       padding: 4.25rem 6rem 6.5rem;
       overflow: hidden;
@@ -81,14 +81,14 @@ const Keyframes = () => (
       font-size: 0.62rem;
       letter-spacing: 0.38em;
       text-transform: uppercase;
-      color: #c9a84c;
+      color: var(--gold);
     }
     .products-eyebrow::before {
       content: '';
       display: block;
       width: 36px;
       height: 1px;
-      background: #c9a84c;
+      background: var(--gold);
       flex-shrink: 0;
     }
 
@@ -98,14 +98,14 @@ const Keyframes = () => (
       font-size: clamp(2rem, 3.8vw, 3.6rem);
       line-height: 1.15;
       letter-spacing: 0.06em;
-      color: #f5f0e8;
+      color: var(--cream);
     }
 
     .products-heading em {
       font-family: 'Cormorant Garamond', serif;
       font-style: italic;
       font-weight: 300;
-      color: #e8c97a;
+      color: var(--gold-light);
     }
 
     /* filter tabs */
@@ -121,16 +121,16 @@ const Keyframes = () => (
       font-size: 0.58rem;
       letter-spacing: 0.25em;
       text-transform: uppercase;
-      color: rgba(245,240,232,0.35);
+      color: var(--text-muted);
       background: none;
       border: 1px solid transparent;
       padding: 0.5rem 1.1rem;
       cursor: pointer;
       transition: color 0.3s, border-color 0.3s;
     }
-    .prod-tab:hover { color: #e8c97a; border-color: rgba(201,168,76,0.3); }
+    .prod-tab:hover { color: var(--gold-light); border-color: rgba(201,168,76,0.3); }
     .prod-tab.active {
-      color: #c9a84c;
+      color: var(--gold);
       border-color: rgba(201,168,76,0.45);
     }
 
@@ -144,8 +144,8 @@ const Keyframes = () => (
     /* ── Card ── */
     .prod-card {
       position: relative;
-      background: #0e0e0e;
-      border: 1px solid rgba(245,240,232,0.06);
+      background: var(--dark2);
+      border: 1px solid var(--border);
       overflow: hidden;
       cursor: pointer;
       transition: border-color 0.45s ease, transform 0.45s ease;
@@ -161,7 +161,7 @@ const Keyframes = () => (
       position: relative;
       overflow: hidden;
       aspect-ratio: 3/4;
-      background: #111;
+      background: var(--dark3);
     }
 
     .prod-img {
@@ -211,16 +211,16 @@ const Keyframes = () => (
       padding: 0.35rem 0.75rem;
       z-index: 3;
     }
-    .prod-badge.new    { background: #c9a84c; color: #080808; }
-    .prod-badge.rare   { background: transparent; border: 1px solid rgba(201,168,76,0.6); color: #c9a84c; }
-    .prod-badge.limited { background: #1a1a1a; border: 1px solid rgba(245,240,232,0.15); color: rgba(245,240,232,0.5); }
+    .prod-badge.new    { background: var(--gold); color: var(--badge-text); }
+    .prod-badge.rare   { background: transparent; border: 1px solid rgba(201,168,76,0.6); color: var(--gold); }
+    .prod-badge.limited { background: var(--dark2); border: 1px solid var(--border); color: var(--text-muted); }
 
     /* Quick-add overlay — slides up from bottom */
     .prod-overlay {
       position: absolute;
       bottom: 0; left: 0; right: 0;
       padding: 1.2rem;
-      background: linear-gradient(to top, rgba(8,8,8,0.97) 0%, transparent 100%);
+      background: linear-gradient(to top, rgba(var(--overlay-rgb),0.97) 0%, transparent 100%);
       transform: translateY(100%);
       transition: transform 0.45s cubic-bezier(0.25,0.46,0.45,0.94);
       z-index: 4;
@@ -235,22 +235,22 @@ const Keyframes = () => (
       font-size: 0.55rem;
       letter-spacing: 0.25em;
       text-transform: uppercase;
-      background: #c9a84c;
-      color: #080808;
+      background: var(--gold);
+      color: var(--badge-text);
       font-weight: bolder;
       border: none;
       padding: 0.75rem 0;
       cursor: pointer;
       transition: background 0.3s;
     }
-    .btn-quick-add:hover { background: #e8c97a; }
+    .btn-quick-add:hover { background: var(--gold-light); }
     .btn-quick-add:disabled { opacity: .6; cursor: not-allowed; }
 
     .btn-wishlist {
       width: 38px;
-      background: rgba(245,240,232,0.08);
-      border: 1px solid rgba(245,240,232,0.12);
-      color: rgba(245,240,232,0.6);
+      background: rgba(var(--text-rgb),0.08);
+      border: 1px solid rgba(var(--text-rgb),0.12);
+      color: var(--text-muted);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -261,7 +261,7 @@ const Keyframes = () => (
     .btn-wishlist:hover {
       background: rgba(201,168,76,0.1);
       border-color: rgba(201,168,76,0.4);
-      color: #c9a84c;
+      color: var(--gold);
     }
 
     /* ── Card body ── */
@@ -270,7 +270,7 @@ const Keyframes = () => (
       display: flex;
       flex-direction: column;
       gap: 0.5rem;
-      border-top: 1px solid rgba(245,240,232,0.05);
+      border-top: 1px solid var(--border);
       position: relative;
     }
 
@@ -281,7 +281,7 @@ const Keyframes = () => (
       top: 0; left: 0;
       height: 1px;
       width: 0;
-      background: #c9a84c;
+      background: var(--gold);
       transition: width 0.5s ease;
     }
     .prod-card:hover .prod-body::before { width: 100%; }
@@ -299,17 +299,17 @@ const Keyframes = () => (
       font-size: 1.2rem;
       font-weight: 300;
       letter-spacing: 0.04em;
-      color: #f5f0e8;
+      color: var(--cream);
       line-height: 1.25;
       transition: color 0.3s;
     }
-    .prod-card:hover .prod-name { color: #e8c97a; }
+    .prod-card:hover .prod-name { color: var(--gold-light); }
 
     .prod-notes {
       font-family: 'Cormorant Garamond', serif;
       font-style: italic;
       font-size: 0.82rem;
-      color: rgba(245,240,232,0.35);
+      color: var(--text-muted);
       line-height: 1.5;
     }
 
@@ -324,7 +324,7 @@ const Keyframes = () => (
       font-family: 'Cinzel', serif;
       font-size: 0.85rem;
       font-weight: 400;
-      color: #c9a84c;
+      color: var(--gold);
       letter-spacing: 0.1em;
     }
 
@@ -333,7 +333,7 @@ const Keyframes = () => (
       font-size: 0.48rem;
       letter-spacing: 0.2em;
       text-transform: uppercase;
-      color: rgba(245,240,232,0.25);
+      color: var(--text-muted);
     }
 
     .prod-cart-msg {
@@ -357,7 +357,7 @@ const Keyframes = () => (
       border-radius: 50%;
       background: rgba(201,168,76,0.3);
     }
-    .rating-dot.filled { background: #c9a84c; }
+    .rating-dot.filled { background: var(--gold); }
 
     /* ── Bottom CTA ── */
     .products-footer {
@@ -410,9 +410,9 @@ const Keyframes = () => (
       font-size: 0.68rem;
       letter-spacing: 0.35em;
       text-transform: uppercase;
-      color: #f5f0e8;
+      color: var(--cream);
       background: transparent;
-      border: 1px solid rgba(245,240,232,0.2);
+      border: 1px solid var(--border);
       padding: 1.1rem 3.5rem;
       cursor: pointer;
       overflow: hidden;
@@ -424,14 +424,14 @@ const Keyframes = () => (
       content: '';
       position: absolute;
       inset: 0;
-      background: #c9a84c;
+      background: var(--gold);
       transform: scaleX(0);
       transform-origin: left;
       transition: transform 0.45s cubic-bezier(0.25,0.46,0.45,0.94);
       z-index: 0;
     }
     .btn-explore-all:hover::before { transform: scaleX(1); }
-    .btn-explore-all:hover { color: #080808; font-weight: bolder; border-color: #c9a84c; }
+    .btn-explore-all:hover { color: var(--badge-text); font-weight: bolder; border-color: var(--gold); }
 
     .btn-explore-all span {
       position: relative;
@@ -442,7 +442,7 @@ const Keyframes = () => (
       font-family: 'Cormorant Garamond', serif;
       font-style: italic;
       font-size: 0.85rem;
-      color: rgba(245,240,232,0.3);
+      color: var(--text-muted);
       letter-spacing: 0.05em;
     }
 
@@ -712,3 +712,4 @@ export default function Products() {
     </>
   );
 }
+

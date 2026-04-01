@@ -130,7 +130,7 @@ const Keyframes = () => (
       left: 0;
       right: 0;
       padding: 2rem 1.5rem 1.5rem;
-      background: linear-gradient(to top, rgba(8,8,8,0.92) 0%, transparent 100%);
+      background: linear-gradient(to top, rgba(var(--overlay-rgb),0.92) 0%, transparent 100%);
       z-index: 2;
     }
 
@@ -197,13 +197,13 @@ const Keyframes = () => (
       font-size: 1.1rem;
       font-weight: 300;
       line-height: 1.9;
-      color: rgba(245,240,232,0.6);
+      color: var(--text-subtle);
       max-width: 460px;
     }
 
     .about-body strong {
       font-weight: 400;
-      color: rgba(245,240,232,0.85);
+      color: var(--text-strong);
     }
 
     /* Signature quote block */
@@ -219,7 +219,7 @@ const Keyframes = () => (
       font-size: 1.15rem;
       font-weight: 300;
       line-height: 1.7;
-      color: rgba(245,240,232,0.5);
+      color: var(--text-muted);
     }
 
     .about-quote cite {
@@ -238,7 +238,7 @@ const Keyframes = () => (
       display: flex;
       gap: 2.5rem;
       padding-top: 1.5rem;
-      border-top: 1px solid rgba(245,240,232,0.07);
+      border-top: 1px solid var(--border);
     }
 
     .pillar {
@@ -264,7 +264,7 @@ const Keyframes = () => (
     .pillar-desc {
       font-family: 'Cormorant Garamond', serif;
       font-size: 0.85rem;
-      color: rgba(245,240,232,0.4);
+      color: var(--text-muted);
       line-height: 1.5;
     }
 

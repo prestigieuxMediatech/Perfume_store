@@ -59,6 +59,7 @@ export default function Products() {
       </div>
 
       {/* Table */}
+      <div className="ad-table-wrap">
       <table className="ad-table">
         <thead>
           <tr>
@@ -161,6 +162,7 @@ export default function Products() {
           ))}
         </tbody>
       </table>
+      </div>
     </>
   );
 }

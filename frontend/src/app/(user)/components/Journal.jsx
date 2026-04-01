@@ -5,10 +5,10 @@ const Styles = () => (
   <style>{`
     .journal-section {
       position: relative;
-      background: #050506;
-      color: #f5f0e8;
+      background: var(--dark);
+      color: var(--cream);
       padding: 4.5rem 6rem 5rem;
-      border-top: 1px solid rgba(245,240,232,0.05);
+      border-top: 1px solid var(--border);
       overflow: hidden;
     }
 
@@ -37,7 +37,7 @@ const Styles = () => (
       font-size: 0.6rem;
       letter-spacing: 0.32em;
       text-transform: uppercase;
-      color: var(--gold, #c9a84c);
+      color: var(--gold, var(--gold));
     }
 
     .journal-eyebrow::before {
@@ -45,7 +45,7 @@ const Styles = () => (
       display: block;
       width: 34px;
       height: 1px;
-      background: var(--gold, #c9a84c);
+      background: var(--gold, var(--gold));
     }
 
     .journal-heading {
@@ -60,14 +60,14 @@ const Styles = () => (
       font-family: 'Cormorant Garamond', serif;
       font-style: italic;
       font-weight: 300;
-      color: var(--gold-light, #e8c97a);
+      color: var(--gold-light, var(--gold-light));
     }
 
     .journal-sub {
       font-family: 'Cormorant Garamond', serif;
       font-size: 0.98rem;
       line-height: 1.8;
-      color: rgba(245,240,232,0.6);
+      color: var(--text-subtle);
       max-width: 360px;
     }
 
@@ -87,9 +87,9 @@ const Styles = () => (
     .journal-card {
       position: relative;
       background: radial-gradient(circle at 0% 0%, rgba(201,168,76,0.18), transparent 60%),
-                  #080808;
+                  var(--dark2);
       border-radius: 18px;
-      border: 1px solid rgba(245,240,232,0.08);
+      border: 1px solid var(--border);
       padding: 1.4rem 1.4rem 1.6rem;
       display: flex;
       flex-direction: column;
@@ -117,13 +117,13 @@ const Styles = () => (
       font-family: 'Cormorant Garamond', serif;
       font-size: 1.1rem;
       letter-spacing: 0.02em;
-      color: #f5f0e8;
+      color: var(--cream);
     }
 
     .journal-meta {
       font-family: 'Cormorant Garamond', serif;
       font-size: 0.8rem;
-      color: rgba(245,240,232,0.4);
+      color: var(--text-muted);
     }
 
     .journal-link {
@@ -132,7 +132,7 @@ const Styles = () => (
       font-size: 0.6rem;
       letter-spacing: 0.28em;
       text-transform: uppercase;
-      color: rgba(245,240,232,0.7);
+      color: var(--text-subtle);
       display: inline-flex;
       align-items: center;
       gap: 0.7rem;
@@ -151,10 +151,10 @@ const Styles = () => (
 
     .journal-newsletter {
       border-radius: 18px;
-      border: 1px solid rgba(245,240,232,0.08);
+      border: 1px solid var(--border);
       padding: 1.8rem 1.6rem 1.9rem;
       background: radial-gradient(circle at 100% 0%, rgba(201,168,76,0.25), transparent 60%),
-                  #050506;
+                  var(--dark2);
       display: flex;
       flex-direction: column;
       gap: 1rem;
@@ -171,7 +171,7 @@ const Styles = () => (
       font-size: 2rem;
       letter-spacing: 0.22em;
       text-transform: uppercase;
-      color: rgba(245,240,232,0.04);
+      color: rgba(var(--text-rgb),0.04);
       transform: rotate(6deg);
       pointer-events: none;
     }
@@ -188,13 +188,13 @@ const Styles = () => (
       font-family: 'Cormorant Garamond', serif;
       font-size: 1.2rem;
       line-height: 1.6;
-      color: #f5f0e8;
+      color: var(--cream);
     }
 
     .journal-newsletter-copy {
       font-family: 'Cormorant Garamond', serif;
       font-size: 0.9rem;
-      color: rgba(245,240,232,0.65);
+      color: var(--text-subtle);
       line-height: 1.7;
     }
 
@@ -207,24 +207,24 @@ const Styles = () => (
     .journal-input {
       flex: 1;
       border-radius: 999px;
-      border: 1px solid rgba(245,240,232,0.14);
-      background: rgba(5,5,6,0.9);
+      border: 1px solid var(--border);
+      background: rgba(var(--overlay-rgb),0.9);
       padding: 0.75rem 1rem;
       font-family: 'Cormorant Garamond', serif;
       font-size: 0.9rem;
-      color: #f5f0e8;
+      color: var(--cream);
       outline: none;
     }
 
     .journal-input::placeholder {
-      color: rgba(245,240,232,0.4);
+      color: var(--text-muted);
     }
 
     .journal-submit {
       border-radius: 999px;
       border: none;
-      background: #c9a84c;
-      color: #080808;
+      background: var(--gold);
+      color: var(--badge-text);
       font-family: 'Cinzel', serif;
       font-size: 0.58rem;
       letter-spacing: 0.28em;
@@ -236,13 +236,13 @@ const Styles = () => (
     }
 
     .journal-submit:hover {
-      background: #e8c97a;
+      background: var(--gold-light);
     }
 
     .journal-small-print {
       font-family: 'Cormorant Garamond', serif;
       font-size: 0.78rem;
-      color: rgba(245,240,232,0.45);
+      color: var(--text-muted);
       margin-top: 0.3rem;
     }
 
@@ -383,4 +383,5 @@ export default function Journal() {
     </>
   );
 }
+
 

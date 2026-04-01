@@ -5,11 +5,11 @@ const Styles = () => (
   <style>{`
     .experience-section {
       position: relative;
-      background: #080808;
-      color: #f5f0e8;
+      background: var(--dark);
+      color: var(--cream);
       padding: 5.5rem 6rem 5rem;
       overflow: hidden;
-      border-top: 1px solid rgba(245,240,232,0.06);
+      border-top: 1px solid var(--border);
     }
 
     .experience-inner {
@@ -65,7 +65,7 @@ const Styles = () => (
       font-size: clamp(2rem, 3.2vw, 3rem);
       line-height: 1.2;
       letter-spacing: 0.06em;
-      color: #f5f0e8;
+      color: var(--cream);
     }
 
     .experience-heading em {
@@ -80,12 +80,12 @@ const Styles = () => (
       font-family: 'Cormorant Garamond', serif;
       font-size: 1.05rem;
       line-height: 1.9;
-      color: rgba(245,240,232,0.6);
+      color: var(--text-subtle);
       max-width: 480px;
     }
 
     .experience-body strong {
-      color: rgba(245,240,232,0.9);
+      color: var(--text-strong);
       font-weight: 400;
     }
 
@@ -95,7 +95,7 @@ const Styles = () => (
       gap: 1.75rem;
       margin-top: 1.5rem;
       padding-top: 1.75rem;
-      border-top: 1px solid rgba(245,240,232,0.08);
+      border-top: 1px solid var(--border);
     }
 
     .exp-step {
@@ -115,13 +115,13 @@ const Styles = () => (
     .exp-step-title {
       font-family: 'Cormorant Garamond', serif;
       font-size: 1.05rem;
-      color: #f5f0e8;
+      color: var(--cream);
     }
 
     .exp-step-copy {
       font-family: 'Cormorant Garamond', serif;
       font-size: 0.9rem;
-      color: rgba(245,240,232,0.5);
+      color: var(--text-muted);
       line-height: 1.6;
     }
 
@@ -129,7 +129,7 @@ const Styles = () => (
       font-family: 'Cormorant Garamond', serif;
       font-style: italic;
       font-size: 0.95rem;
-      color: rgba(245,240,232,0.45);
+      color: var(--text-muted);
       margin-top: 0.5rem;
     }
 
@@ -138,9 +138,9 @@ const Styles = () => (
       padding: 2.25rem 2rem;
       border-radius: 20px;
       background: radial-gradient(circle at 0% 0%, rgba(201,168,76,0.18), transparent 55%),
-                  radial-gradient(circle at 100% 100%, rgba(245,240,232,0.18), transparent 55%),
-                  #050506;
-      border: 1px solid rgba(245,240,232,0.06);
+                  radial-gradient(circle at 100% 100%, rgba(var(--text-rgb),0.18), transparent 55%),
+                  var(--dark2);
+      border: 1px solid var(--border);
       overflow: hidden;
     }
 
@@ -153,7 +153,7 @@ const Styles = () => (
       font-family: 'Cinzel', serif;
       font-size: 0.6rem;
       letter-spacing: 0.55em;
-      color: rgba(245,240,232,0.12);
+      color: rgba(var(--text-rgb),0.12);
       text-transform: uppercase;
     }
 
@@ -170,7 +170,7 @@ const Styles = () => (
       font-style: italic;
       font-size: 1.15rem;
       line-height: 1.8;
-      color: rgba(245,240,232,0.9);
+      color: var(--text-strong);
       max-width: 320px;
     }
 
@@ -192,7 +192,7 @@ const Styles = () => (
     .experience-guest-meta {
       font-family: 'Cormorant Garamond', serif;
       font-size: 0.85rem;
-      color: rgba(245,240,232,0.55);
+      color: var(--text-muted);
     }
 
     .experience-badge {

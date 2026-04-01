@@ -6,10 +6,10 @@ const Styles = () => (
     /* ── Section ── */
     .reviews-section {
       position: relative;
-      background: #050506;
-      color: #f5f0e8;
+      background: var(--dark);
+      color: var(--cream);
       padding: 10rem 0 10rem;
-      border-top: 1px solid rgba(245,240,232,0.06);
+      border-top: 1px solid var(--border);
       overflow: hidden;
     }
 
@@ -62,7 +62,7 @@ const Styles = () => (
       font-size: 0.62rem;
       letter-spacing: 0.38em;
       text-transform: uppercase;
-      color: #c9a84c;
+      color: var(--gold);
       margin-bottom: 1.2rem;
     }
     .reviews-eyebrow::before {
@@ -70,7 +70,7 @@ const Styles = () => (
       display: block;
       width: 36px;
       height: 1px;
-      background: #c9a84c;
+      background: var(--gold);
       flex-shrink: 0;
     }
 
@@ -80,20 +80,20 @@ const Styles = () => (
       font-size: clamp(2rem, 3.2vw, 3rem);
       letter-spacing: 0.06em;
       line-height: 1.2;
-      color: #f5f0e8;
+      color: var(--cream);
     }
     .reviews-heading em {
       font-family: 'Cormorant Garamond', serif;
       font-style: italic;
       font-weight: 300;
-      color: #e8c97a;
+      color: var(--gold-light);
     }
 
     .reviews-sub {
       font-family: 'Cormorant Garamond', serif;
       font-size: 1rem;
       line-height: 1.85;
-      color: rgba(245,240,232,0.45);
+      color: var(--text-muted);
       max-width: 340px;
       text-align: right;
     }
@@ -118,8 +118,8 @@ const Styles = () => (
     .review-card {
       flex: 0 0 calc(33.333% - 1rem);
       max-width: calc(33.333% - 1rem);
-      background: #0c0c0d;
-      border: 1px solid rgba(245,240,232,0.07);
+      background: var(--dark2);
+      border: 1px solid var(--border);
       padding: 2.25rem 2rem 2rem;
       display: flex;
       flex-direction: column;
@@ -136,7 +136,7 @@ const Styles = () => (
       position: absolute;
       top: 0; left: 0;
       width: 40px; height: 1px;
-      background: #c9a84c;
+      background: var(--gold);
       opacity: 0;
       transition: opacity 0.4s ease, width 0.5s ease;
     }
@@ -145,7 +145,7 @@ const Styles = () => (
       position: absolute;
       top: 0; left: 0;
       width: 1px; height: 40px;
-      background: #c9a84c;
+      background: var(--gold);
       opacity: 0;
       transition: opacity 0.4s ease, height 0.5s ease;
     }
@@ -189,7 +189,7 @@ const Styles = () => (
       font-family: 'Cormorant Garamond', serif;
       font-size: 1.05rem;
       line-height: 1.9;
-      color: rgba(245,240,232,0.78);
+      color: var(--text-strong);
       flex: 1;
     }
 
@@ -214,14 +214,14 @@ const Styles = () => (
       font-size: 0.7rem;
       letter-spacing: 0.22em;
       text-transform: uppercase;
-      color: #c9a84c;
+      color: var(--gold);
     }
 
     .review-detail {
       font-family: 'Cormorant Garamond', serif;
       font-style: italic;
       font-size: 0.85rem;
-      color: rgba(245,240,232,0.38);
+      color: var(--text-muted);
     }
 
     /* Star rating */
@@ -234,7 +234,7 @@ const Styles = () => (
       border-radius: 50%;
       background: rgba(201,168,76,0.25);
     }
-    .star.on { background: #c9a84c; }
+    .star.on { background: var(--gold); }
 
     /* ── Controls ── */
     .reviews-controls {
@@ -249,7 +249,7 @@ const Styles = () => (
       font-family: 'Cormorant Garamond', serif;
       font-style: italic;
       font-size: 0.9rem;
-      color: rgba(245,240,232,0.35);
+      color: var(--text-muted);
     }
 
     .reviews-dots-arrows {
@@ -275,12 +275,12 @@ const Styles = () => (
       display: block;
       height: 5px;
       border-radius: 999px;
-      background: rgba(245,240,232,0.2);
+      background: rgba(var(--text-rgb),0.2);
       transition: background 0.35s ease, width 0.35s ease;
       width: 5px;
     }
     .r-dot.active .r-dot-inner {
-      background: #c9a84c;
+      background: var(--gold);
       width: 24px;
     }
 
@@ -292,9 +292,9 @@ const Styles = () => (
     .r-arrow {
       width: 40px; height: 40px;
       border-radius: 50%;
-      border: 1px solid rgba(245,240,232,0.14);
+      border: 1px solid var(--border);
       background: transparent;
-      color: rgba(245,240,232,0.7);
+      color: var(--text-subtle);
       font-size: 1.1rem;
       display: flex;
       align-items: center;
@@ -305,14 +305,14 @@ const Styles = () => (
     .r-arrow:hover {
       background: rgba(201,168,76,0.1);
       border-color: rgba(201,168,76,0.5);
-      color: #c9a84c;
+      color: var(--gold);
       transform: scale(1.08);
     }
 
     /* ── Progress bar ── */
     .reviews-progress-wrap {
       height: 1px;
-      background: rgba(245,240,232,0.06);
+      background: rgba(var(--text-rgb),0.06);
       margin-bottom: 0;
       position: relative;
       overflow: hidden;
@@ -321,7 +321,7 @@ const Styles = () => (
       position: absolute;
       top: 0; left: 0;
       height: 100%;
-      background: linear-gradient(90deg, #c9a84c, #e8c97a);
+      background: linear-gradient(90deg, var(--gold), var(--gold-light));
       transition: width 0.2s linear;
     }
 
@@ -547,3 +547,4 @@ export default function Reviews() {
     </>
   );
 }
+

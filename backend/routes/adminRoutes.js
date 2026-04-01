@@ -17,7 +17,7 @@ const {
   updateProduct,
   deleteProduct
 } = require('../controllers/adminAuthController');
-const { getAdminOrders, updateOrderStatus } = require('../controllers/orderController');
+const { getAdminOrders, getAdminOrderById, updateOrderStatus } = require('../controllers/orderController');
 const adminAuth = require('../middleware/adminAuth');
 
 router.post('/login', login);
@@ -37,6 +37,7 @@ router.put('/products/:id',      adminAuth, upload.array('images', 3), updatePro
 router.delete('/products/:id', adminAuth, deleteProduct);
 
 router.get('/orders', adminAuth, getAdminOrders);
+router.get('/orders/:id', adminAuth, getAdminOrderById);
 router.put('/orders/:id/status', adminAuth, updateOrderStatus);
 
 module.exports = router;

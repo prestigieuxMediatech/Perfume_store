@@ -4,21 +4,7 @@ import { useState, useEffect } from 'react';
 import Image from 'next/image';
 
 const Styles = () => (
-  <style>{`
-    @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Cinzel:wght@300;400;500&display=swap');
-
-    :root {
-      --gold:   #c9a84c;
-      --goldL:  #e8c97a;
-      --cream:  #f5f0e8;
-      --dark:   #080808;
-      --dark2:  #0d0d0e;
-      --muted:  rgba(245,240,232,0.42);
-      --border: rgba(245,240,232,0.07);
-      --goldB:  rgba(201,168,76,0.18);
-    }
-
-    @keyframes fadeUp   { from{opacity:0;transform:translateY(28px)} to{opacity:1;transform:translateY(0)} }
+  <style>{`\n@keyframes fadeUp   { from{opacity:0;transform:translateY(28px)} to{opacity:1;transform:translateY(0)} }
     @keyframes fadeIn   { from{opacity:0} to{opacity:1} }
     @keyframes floatImg { 0%,100%{transform:translateY(0) rotate(-.5deg)} 50%{transform:translateY(-18px) rotate(.5deg)} }
     @keyframes glowPulse{ 0%,100%{opacity:.25;transform:scale(1)} 50%{opacity:.55;transform:scale(1.12)} }
@@ -246,7 +232,7 @@ const Styles = () => (
       color:var(--gold); display:block; margin-bottom:.3rem;
     }
     .ct-info-val {
-      font-size:1rem; color:rgba(245,240,232,.7);
+      font-size:1rem; color:var(--text-subtle);
       line-height:1.6; text-decoration:none;
       transition:color .3s; display:block;
     }
@@ -606,3 +592,4 @@ export default function page() {
     </div>
   );
 }
+
