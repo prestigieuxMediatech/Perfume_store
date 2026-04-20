@@ -11,6 +11,7 @@ export default function Orders() {
   const [detailsLoading, setDetailsLoading] = useState(false);
   const [detailsError, setDetailsError] = useState("");
   const [selectedOrder, setSelectedOrder] = useState(null);
+  const [deletingId, setDeletingId] = useState(null);
 
   const getToken = () => (
     typeof window !== "undefined" ? localStorage.getItem("adminToken") : ""
@@ -56,6 +57,32 @@ export default function Orders() {
       }
     );
     fetchOrders();
+  };
+
+  const deleteOrder = async (id) => {
+    if (!id) return;
+    const ok = window.confirm("Permanently delete this order? This cannot be undone.");
+    if (!ok) return;
+    setDeletingId(id);
+    try {
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/admin/orders/${id}`,
+        { method: "DELETE", headers: { Authorization: `Bearer ${getToken()}` } }
+      );
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        window.alert(data.message || "Failed to delete order");
+        return;
+      }
+      setOrders((prev) => prev.filter((order) => order.id !== id));
+      if (selectedOrder && selectedOrder.id === id) {
+        closeDetails();
+      }
+    } catch {
+      window.alert("Failed to delete order");
+    } finally {
+      setDeletingId(null);
+    }
   };
 
   const openDetails = async (orderId) => {
@@ -110,13 +137,14 @@ export default function Orders() {
               <th>Date</th>
               <th>Details</th>
               <th>Update</th>
+              <th>Delete</th>
             </tr>
           </thead>
           <tbody>
             {loading ? (
-              <tr><td colSpan={7} style={{ color:"#7A7264", textAlign:"center", padding:"2rem" }}>Loading...</td></tr>
+              <tr><td colSpan={8} style={{ color:"#7A7264", textAlign:"center", padding:"2rem" }}>Loading...</td></tr>
             ) : orders.length === 0 ? (
-              <tr><td colSpan={7} style={{ color:"#7A7264", textAlign:"center", padding:"2rem" }}>No orders found</td></tr>
+              <tr><td colSpan={8} style={{ color:"#7A7264", textAlign:"center", padding:"2rem" }}>No orders found</td></tr>
             ) : orders.map(order => (
               <tr key={order.id}>
                 <td style={{ color:"#C9A84C", cursor:"pointer" }} onClick={() => openDetails(order.id)}>
@@ -141,6 +169,15 @@ export default function Orders() {
                       .map(s => <option key={s} value={s}>{s}</option>)
                     }
                   </select>
+                </td>
+                <td>
+                  <button
+                    className="ad-btn danger"
+                    onClick={() => deleteOrder(order.id)}
+                    disabled={deletingId === order.id}
+                  >
+                    {deletingId === order.id ? "Deleting..." : "Delete"}
+                  </button>
                 </td>
               </tr>
             ))}
@@ -216,9 +253,14 @@ export default function Orders() {
                   <div className="ad-items">
                     {selectedOrder.items?.length ? selectedOrder.items.map((item) => (
                       <div key={item.id} className="ad-item-row">
-                        <div className="ad-item-name">{item.product_name}</div>
+                        <div className="ad-item-name">
+                          {item.item_type === "box" ? item.box_name : item.product_name}
+                        </div>
                         <div className="ad-item-meta">
-                          {item.size ? `Size: ${item.size}` : "Size: -"} · Qty {item.quantity}
+                          {item.item_type === "box"
+                            ? `Custom box · Qty ${item.quantity}`
+                            : `${item.size ? `Size: ${item.size}` : "Size: -"} · Qty ${item.quantity}`
+                          }
                         </div>
                         <div className="ad-item-price">{formatMoney(item.line_total)}</div>
                       </div>

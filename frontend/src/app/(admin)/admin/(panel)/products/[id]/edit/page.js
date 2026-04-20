@@ -7,6 +7,11 @@ import Link from "next/link";
 
 const BASE         = process.env.NEXT_PUBLIC_API_URL;
 const SIZE_OPTIONS = ["25ml", "50ml", "75ml", "100ml", "150ml", "200ml"];
+const slugifyGroup = (value) => value
+  .toLowerCase()
+  .trim()
+  .replace(/[^a-z0-9]+/g, '-')
+  .replace(/(^-|-$)/g, '');
 
 export default function EditProduct() {
   const router = useRouter();
@@ -15,6 +20,7 @@ export default function EditProduct() {
   // ── State ──────────────────────────────────────────────
   const [form, setForm] = useState({
     name:        "",
+    group_name:  "",
     description: "",
     category_id: "",
     brand_id:    "",
@@ -31,6 +37,7 @@ export default function EditProduct() {
   const [serverError, setServerError]       = useState("");
   const [brands, setBrands]         = useState([]);
   const [filteredBrands, setFilteredBrands] = useState([]);
+  const [groupTouched, setGroupTouched] = useState(false);
 
   const fileInputRef = useRef(null);
 
@@ -51,6 +58,7 @@ export default function EditProduct() {
 
         setForm({
           name:        p.name        ?? "",
+          group_name:  p.group_name  ?? "",
           description: p.description ?? "",
           category_id: p.category_id ?? "",
         });
@@ -98,8 +106,18 @@ export default function EditProduct() {
   // ── Form change ────────────────────────────────────────
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setForm({ ...form, [name]: value });
+    if (name === "name" && !groupTouched) {
+      setForm({ ...form, name: value, group_name: value ? slugifyGroup(value) : "" });
+    } else {
+      setForm({ ...form, [name]: value });
+    }
     setErrors({ ...errors, [name]: "" });
+  };
+
+  const handleGroupChange = (e) => {
+    setGroupTouched(true);
+    setForm({ ...form, group_name: e.target.value });
+    setErrors({ ...errors, group_name: "" });
   };
 
   // ── Variant handlers ───────────────────────────────────
@@ -168,6 +186,7 @@ export default function EditProduct() {
     try {
       const formData = new FormData();
       formData.append("name",        form.name);
+      if (form.group_name) formData.append("group_name", form.group_name);
       formData.append("description", form.description);
       if (form.category_id) formData.append("category_id", form.category_id);
       if (form.brand_id) formData.append("brand_id", form.brand_id);
@@ -225,6 +244,20 @@ export default function EditProduct() {
             value={form.name} onChange={handleChange}
           />
           {errors.name && <p style={{ color:"#E8472A", fontSize:"0.68rem", marginTop:"0.3rem" }}>{errors.name}</p>}
+        </div>
+
+        {/* Group Name */}
+        <div style={{ marginBottom:"1.2rem" }}>
+          <label className="ad-label">
+            Group Name
+            <span style={{ color:"#4a4540", fontSize:"0.58rem", textTransform:"none", marginLeft:"0.4rem" }}>
+              — same value for related types (perfume/mist/wash)
+            </span>
+          </label>
+          <input
+            className="ad-input" type="text" name="group_name"
+            value={form.group_name} onChange={handleGroupChange}
+          />
         </div>
 
         {/* Description */}

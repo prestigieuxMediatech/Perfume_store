@@ -328,7 +328,7 @@ export default function Journal() {
               </h2>
             </div>
             <p className="journal-sub">
-              Essays, rituals and field notes from the perfumers behind Aurum —
+              Essays, rituals and field notes from the perfumers behind 7EVEN —
               written to help you wear fragrance with intention.
             </p>
           </header>

@@ -7,7 +7,7 @@ export default function SiteFooter() {
       <div className="site-footer-inner">
 
         <div className="footer-brand">
-          <span className="footer-logo">Aurum</span>
+          <span className="footer-logo">7EVEN</span>
 
           <p className="footer-copy">
             A maison de parfum dedicated to rare ingredients, quiet luxury
@@ -33,8 +33,8 @@ export default function SiteFooter() {
               <li>By appointment only</li>
               <li>Grasse · Paris · Mumbai</li>
               <li>
-                <a href="mailto:concierge@aurumparfum.com">
-                  concierge@aurumparfum.com
+                <a href="mailto:concierge@7EVENparfum.com">
+                  concierge@7EVENparfum.com
                 </a>
               </li>
             </ul>
@@ -55,7 +55,7 @@ export default function SiteFooter() {
       <div className="site-footer-bottom">
 
         <span className="footer-small">
-          © {new Date().getFullYear()} Aurum Parfum. All rights reserved.
+          © {new Date().getFullYear()} 7EVEN Parfum. All rights reserved.
         </span>
 
         <div className="footer-small-links">

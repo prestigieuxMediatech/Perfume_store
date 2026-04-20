@@ -1,9 +1,10 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import { useState } from "react";
 import axios from "axios";
 import { useCart } from "../context/CartContext";
 import { useAuth } from "../context/AuthContext";
 import SizeSelector from "./SizeSelector";
+import useReveal from "../hooks/useReveal";
 
 const BASE = process.env.NEXT_PUBLIC_API_URL;
 
@@ -30,10 +31,9 @@ const Keyframes = () => (
     /* ── Section ── */
     .products-section {
       position: relative;
-      background: var(--dark);
-      color: var(--cream);
-      /* Tighter top padding so the gap after About feels balanced on desktop */
-      padding: 4.25rem 6rem 6.5rem;
+      background: var(--bg);
+      color: var(--text);
+      padding: 3.75rem 5rem 6rem;
       overflow: hidden;
       scroll-margin-top: 90px;
     }
@@ -98,7 +98,7 @@ const Keyframes = () => (
       font-size: clamp(2rem, 3.8vw, 3.6rem);
       line-height: 1.15;
       letter-spacing: 0.06em;
-      color: var(--cream);
+      color: var(--text);
     }
 
     .products-heading em {
@@ -144,8 +144,9 @@ const Keyframes = () => (
     /* ── Card ── */
     .prod-card {
       position: relative;
-      background: var(--dark2);
+      background: var(--surface);
       border: 1px solid var(--border);
+      border-radius: 16px;
       overflow: hidden;
       cursor: pointer;
       transition: border-color 0.45s ease, transform 0.45s ease;
@@ -161,7 +162,7 @@ const Keyframes = () => (
       position: relative;
       overflow: hidden;
       aspect-ratio: 3/4;
-      background: var(--dark3);
+      background: var(--surface-2);
     }
 
     .prod-img {
@@ -299,7 +300,7 @@ const Keyframes = () => (
       font-size: 1.2rem;
       font-weight: 300;
       letter-spacing: 0.04em;
-      color: var(--cream);
+      color: var(--text);
       line-height: 1.25;
       transition: color 0.3s;
     }
@@ -309,7 +310,7 @@ const Keyframes = () => (
       font-family: 'Cormorant Garamond', serif;
       font-style: italic;
       font-size: 0.82rem;
-      color: var(--text-muted);
+      color: var(--text-subtle);
       line-height: 1.5;
     }
 
@@ -319,6 +320,7 @@ const Keyframes = () => (
       justify-content: space-between;
       margin-top: 0.5rem;
     }
+    .prod-list-cta { display: none; }
 
     .prod-price {
       font-family: 'Cinzel', serif;
@@ -410,7 +412,7 @@ const Keyframes = () => (
       font-size: 0.68rem;
       letter-spacing: 0.35em;
       text-transform: uppercase;
-      color: var(--cream);
+      color: var(--text);
       background: transparent;
       border: 1px solid var(--border);
       padding: 1.1rem 3.5rem;
@@ -448,21 +450,25 @@ const Keyframes = () => (
 
     /* ── Responsive ── */
     @media (max-width: 1200px) {
+      .products-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+    @media (max-width: 980px) {
       .products-grid { grid-template-columns: repeat(2, 1fr); }
     }
     @media (max-width: 900px) {
-      .products-section { padding: 7rem 3rem; }
+      .products-section { padding: 3.5rem 3rem 5rem; }
       .products-header { flex-direction: column; align-items: flex-start; }
     }
-    @media (max-width: 600px) {
-      .products-section { padding: 5rem 1.25rem; }
-      .products-grid { grid-template-columns: repeat(2, 1fr); gap: 1rem; }
-      .products-heading { font-size: 1.8rem; }
-      .prod-body { padding: 1rem; }
-      .prod-name { font-size: 1rem; }
-    }
-    @media (max-width: 420px) {
+    @media (max-width: 768px) {
+      .products-section { padding: 3.5rem 1.5rem 4.5rem; }
       .products-grid { grid-template-columns: 1fr; }
+      .prod-card { display: grid; grid-template-columns: 120px 1fr; min-height: 150px; }
+      .prod-img-wrap { aspect-ratio: unset; min-height: 150px; }
+      .prod-body { padding: 1rem; }
+      .prod-overlay { display: none; }
+      .prod-list-cta { display: flex; gap: 0.6rem; margin-top: 0.6rem; }
+      .btn-quick-add { font-size: 0.5rem; padding: 0.6rem 0; }
+      .btn-wishlist { width: 34px; }
     }
 
     @media (prefers-reduced-motion: reduce) {
@@ -545,34 +551,13 @@ function IconHeart() {
   );
 }
 
-function useReveal(selector) {
-  useEffect(() => {
-    const els = document.querySelectorAll(selector);
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((e) => {
-          if (e.isIntersecting) {
-            e.target.classList.add("visible");
-            observer.unobserve(e.target);
-          }
-        });
-      },
-      { threshold: 0.12 }
-    );
-    els.forEach((el) => observer.observe(el));
-    return () => observer.disconnect();
-  }, [selector]);
-}
-
-
 export default function Products() {
-  const [activeTab, setActiveTab] = React.useState("All");
   const { user } = useAuth();
   const { addItem } = useCart();
   const [addingId, setAddingId] = useState(null);
   const [cartFeedback, setCartFeedback] = useState({ id: null, type: "", text: "" });
   const [selectorProduct, setSelectorProduct] = useState(null);
-  useReveal(".prod-reveal");
+  useReveal({ selector: ".prod-reveal", visibleClass: "visible", threshold: 0.12 });
 
   const showCartFeedback = (id, type, text) => {
     setCartFeedback({ id, type, text });
@@ -675,6 +660,18 @@ export default function Products() {
                       <RatingDots count={5} filled={p.rating} />
                       <span className="prod-size">{p.size}</span>
                     </div>
+                  </div>
+                  <div className="prod-list-cta">
+                    <button
+                      className="btn-quick-add"
+                      onClick={() => handleQuickAdd(p.id)}
+                      disabled={addingId === p.id}
+                    >
+                      {addingId === p.id ? "Adding..." : "Add to Cart"}
+                    </button>
+                    <button className="btn-wishlist" aria-label="Wishlist">
+                      <IconHeart />
+                    </button>
                   </div>
                   {cartFeedback.id === p.id && (
                     <div className={`prod-cart-msg ${cartFeedback.type}`}>

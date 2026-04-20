@@ -22,6 +22,12 @@ const allowedStatuses = new Set([
   'paid'
 ]);
 
+const cancellableStatuses = new Set([
+  'pending',
+  'confirmed',
+  'processing'
+]);
+
 const normalize = (value) => (typeof value === 'string' ? value.trim() : value);
 
 const validateOrderInput = (body) => {
@@ -43,10 +49,23 @@ const validateOrderInput = (body) => {
   return errors;
 };
 
-const calculateTotals = (items) => {
+const calculateTotals = (productItems, boxItems) => {
   let subtotal = 0;
-  const lineItems = items.map((item) => {
+
+  const productLines = productItems.map((item) => {
     const unit = Number(item.discount_price || item.price) || 0;
+    const qty = Number(item.quantity) || 0;
+    const line_total = unit * qty;
+    subtotal += line_total;
+    return {
+      ...item,
+      unit_price: unit,
+      line_total
+    };
+  });
+
+  const boxLines = boxItems.map((item) => {
+    const unit = Number(item.price) || 0;
     const qty = Number(item.quantity) || 0;
     const line_total = unit * qty;
     subtotal += line_total;
@@ -62,7 +81,7 @@ const calculateTotals = (items) => {
   const discount_total = 0;
   const grand_total = subtotal + shipping_fee + tax_total - discount_total;
 
-  return { subtotal, shipping_fee, tax_total, discount_total, grand_total, lineItems };
+  return { subtotal, shipping_fee, tax_total, discount_total, grand_total, productLines, boxLines };
 };
 
 exports.placeOrder = async (req, res) => {
@@ -95,12 +114,26 @@ exports.placeOrder = async (req, res) => {
       ORDER BY ci.created_at DESC
     `, [userId]);
 
-    if (!cartItems || cartItems.length === 0) {
+    const [boxItems] = await connection.query(`
+      SELECT
+        cbi.id,
+        cbi.quantity,
+        cbi.selections_json,
+        b.id AS box_id,
+        b.name AS box_name,
+        b.price
+      FROM cart_box_items cbi
+      JOIN boxes b ON cbi.box_id = b.id
+      WHERE cbi.user_id = ?
+      ORDER BY cbi.created_at DESC
+    `, [userId]);
+
+    if ((!cartItems || cartItems.length === 0) && (!boxItems || boxItems.length === 0)) {
       await connection.rollback();
       return res.status(400).json({ message: 'Cart is empty' });
     }
 
-    const totals = calculateTotals(cartItems);
+    const totals = calculateTotals(cartItems, boxItems);
     const orderId = crypto.randomUUID();
 
     await connection.query(`
@@ -132,7 +165,7 @@ exports.placeOrder = async (req, res) => {
       payment_method
     ]);
 
-    for (const item of totals.lineItems) {
+    for (const item of totals.productLines) {
       await connection.query(`
         INSERT INTO order_details (
           id, order_id, product_id, variant_id, quantity,
@@ -149,8 +182,29 @@ exports.placeOrder = async (req, res) => {
       ]);
     }
 
+    for (const item of totals.boxLines) {
+      await connection.query(`
+        INSERT INTO order_box_details (
+          id, order_id, box_id, box_name, quantity,
+          unit_price, line_total, selections_json
+        ) VALUES (UUID(), ?, ?, ?, ?, ?, ?, ?)
+      `, [
+        orderId,
+        item.box_id,
+        item.box_name,
+        item.quantity,
+        item.unit_price,
+        item.line_total,
+        item.selections_json
+      ]);
+    }
+
     await connection.query(
       `DELETE FROM cart_items WHERE user_id = ?`,
+      [userId]
+    );
+    await connection.query(
+      `DELETE FROM cart_box_items WHERE user_id = ?`,
       [userId]
     );
 
@@ -203,13 +257,39 @@ exports.getMyOrders = async (req, res) => {
       ORDER BY od.id ASC
     `, [orderIds]);
 
+    const [boxItems] = await pool.query(`
+      SELECT
+        obd.id,
+        obd.order_id,
+        obd.box_id,
+        obd.box_name,
+        obd.quantity,
+        obd.unit_price,
+        obd.line_total,
+        obd.selections_json
+      FROM order_box_details obd
+      WHERE obd.order_id IN (?)
+      ORDER BY obd.id ASC
+    `, [orderIds]);
+
     const itemsByOrder = new Map();
     for (const order of orders) {
       itemsByOrder.set(order.id, []);
     }
     items.forEach((item) => {
       if (!itemsByOrder.has(item.order_id)) itemsByOrder.set(item.order_id, []);
-      itemsByOrder.get(item.order_id).push(item);
+      itemsByOrder.get(item.order_id).push({
+        ...item,
+        item_type: 'product'
+      });
+    });
+
+    boxItems.forEach((item) => {
+      if (!itemsByOrder.has(item.order_id)) itemsByOrder.set(item.order_id, []);
+      itemsByOrder.get(item.order_id).push({
+        ...item,
+        item_type: 'box'
+      });
     });
 
     const response = orders.map((order) => ({
@@ -220,6 +300,41 @@ exports.getMyOrders = async (req, res) => {
     res.status(200).json(response);
   } catch (err) {
     console.error('Get orders error:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+exports.cancelMyOrder = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { id } = req.params;
+
+    const [orders] = await pool.query(
+      `SELECT id, status FROM orders WHERE id = ? AND user_id = ?`,
+      [id, userId]
+    );
+
+    if (!orders || orders.length === 0) {
+      return res.status(404).json({ message: 'Order not found' });
+    }
+
+    const currentStatus = orders[0].status;
+    if (currentStatus === 'cancelled') {
+      return res.status(400).json({ message: 'Order already cancelled' });
+    }
+
+    if (!cancellableStatuses.has(currentStatus)) {
+      return res.status(400).json({ message: 'Order can no longer be cancelled' });
+    }
+
+    await pool.query(
+      `UPDATE orders SET status = 'cancelled' WHERE id = ?`,
+      [id]
+    );
+
+    res.status(200).json({ message: 'Order cancelled', status: 'cancelled' });
+  } catch (err) {
+    console.error('Cancel order error:', err);
     res.status(500).json({ message: 'Server error' });
   }
 };
@@ -291,9 +406,26 @@ exports.getAdminOrderById = async (req, res) => {
       ORDER BY od.id ASC
     `, [id]);
 
+    const [boxItems] = await pool.query(`
+      SELECT
+        obd.id,
+        obd.quantity,
+        obd.unit_price,
+        obd.line_total,
+        obd.box_id,
+        obd.box_name,
+        obd.selections_json
+      FROM order_box_details obd
+      WHERE obd.order_id = ?
+      ORDER BY obd.id ASC
+    `, [id]);
+
     res.status(200).json({
       ...orders[0],
-      items
+      items: [
+        ...items.map((item) => ({ ...item, item_type: 'product' })),
+        ...boxItems.map((item) => ({ ...item, item_type: 'box' }))
+      ]
     });
   } catch (err) {
     console.error('Admin order detail error:', err);
@@ -318,6 +450,30 @@ exports.updateOrderStatus = async (req, res) => {
     res.status(200).json({ message: 'Order status updated' });
   } catch (err) {
     console.error('Update order status error:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+exports.deleteAdminOrder = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const [existing] = await pool.query(
+      `SELECT id FROM orders WHERE id = ?`,
+      [id]
+    );
+    if (!existing || existing.length === 0) {
+      return res.status(404).json({ message: 'Order not found' });
+    }
+
+    await pool.query(
+      `DELETE FROM orders WHERE id = ?`,
+      [id]
+    );
+
+    res.status(200).json({ message: 'Order deleted' });
+  } catch (err) {
+    console.error('Delete order error:', err);
     res.status(500).json({ message: 'Server error' });
   }
 };

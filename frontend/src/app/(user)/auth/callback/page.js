@@ -26,11 +26,8 @@ export default function AuthCallback() {
     })
       .then(res => res.json())
       .then(data => {
-        // ✅ Handle both array and object response
-        const userData = Array.isArray(data) ? data[0] : data;
-
-        if (userData && userData.id) {
-          login(token, userData);
+        if (data && data.id) {
+          login(token, data);
           localStorage.removeItem("returnTo");
           router.push(returnTo);
         } else {

@@ -63,13 +63,14 @@ export default function SiteHeader() {
     <>
       <header className="site-header">
 
-        <Link href="/" className="site-logo">Aurum</Link>
+        <Link href="/" className="site-logo">7EVEN</Link>
 
         <nav>
           <ul className="site-nav">
             <li><Link href="/"        className={isActive("/")}>Home</Link></li>
             <li><Link href="/about"   className={isActive("/about")}>About</Link></li>
             <li><Link href="/shop"    className={isActive("/shop")}>Shop</Link></li>
+            <li><Link href="/build-your-box" className={isActive("/build-your-box")}>Build Your Box</Link></li>
             <li><Link href="/contact" className={isActive("/contact")}>Contact</Link></li>
           </ul>
         </nav>
@@ -168,6 +169,7 @@ export default function SiteHeader() {
         <Link href="/"        className={isActive("/")}        onClick={() => setMenuOpen(false)}>Home</Link>
         <Link href="/about"   className={isActive("/about")}   onClick={() => setMenuOpen(false)}>About</Link>
         <Link href="/shop"    className={isActive("/shop")}    onClick={() => setMenuOpen(false)}>Shop</Link>
+        <Link href="/build-your-box" className={isActive("/build-your-box")} onClick={() => setMenuOpen(false)}>Build Your Box</Link>
         <Link href="/contact" className={isActive("/contact")} onClick={() => setMenuOpen(false)}>Contact</Link>
         <button
           className="mobile-theme-toggle"

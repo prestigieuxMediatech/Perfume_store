@@ -1,23 +1,33 @@
 "use client";
 import { createContext, useContext, useEffect, useState } from "react";
+import axios from "axios";
 
 const AuthContext = createContext(null);
+const BASE = process.env.NEXT_PUBLIC_API_URL;
 
 export function AuthProvider({ children }) {
   const [user, setUser]       = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(() => {
+    if (typeof window === "undefined") return true;
+    return !!localStorage.getItem("token");
+  });
+
+  const loadUser = async (token) => {
+    const res = await axios.get(`${BASE}/api/auth/me`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return res.data;
+  };
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    if (!token) { setLoading(false); return; }
+    if (!token) {
+      return;
+    }
 
-    fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/me`, {
-      headers: { Authorization: `Bearer ${token}` }
-    })
-      .then(res => res.ok ? res.json() : null)
-      .then(data => {
-        if (data && data.length > 0) setUser(data[0]);
-        else if (data && data.id) setUser(data);
+    loadUser(token)
+      .then((data) => {
+        if (data?.id) setUser(data);
         else localStorage.removeItem("token");
       })
       .catch(() => localStorage.removeItem("token"))
@@ -29,13 +39,26 @@ export function AuthProvider({ children }) {
     setUser(userData);
   };
 
+  const authenticate = async (mode, payload) => {
+    const endpoint = mode === "signup" ? "signup" : "login";
+    const res = await axios.post(`${BASE}/api/auth/${endpoint}`, payload);
+    const { token, user: userData } = res.data || {};
+
+    if (!token || !userData?.id) {
+      throw new Error("Authentication response is incomplete.");
+    }
+
+    login(token, userData);
+    return userData;
+  };
+
   const logout = () => {
     localStorage.removeItem("token");
     setUser(null);
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, logout }}>
+    <AuthContext.Provider value={{ user, loading, login, logout, authenticate }}>
       {children}
     </AuthContext.Provider>
   );

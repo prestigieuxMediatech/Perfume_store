@@ -415,7 +415,7 @@ export default function ProductListing() {
             </h1>
             <p className="pl-hero-sub">
               Each scent a chapter. Each bottle a world. Discover the compositions
-              that have defined Aurum for thirty-seven years.
+              that have defined 7EVEN for thirty-seven years.
             </p>
             <p className="pl-result-count">{filtered.length} Fragrances</p>
           </div>

@@ -58,6 +58,24 @@ export function CartProvider({ children }) {
     }
   };
 
+  const addBox = async ({ box_id, selections, quantity = 1 }) => {
+    if (!user) return { ok: false, reason: "auth" };
+    try {
+      await axios.post(
+        `${BASE}/api/auth/cart/box`,
+        { box_id, selections, quantity },
+        { headers: getAuthHeaders() }
+      );
+      await refresh();
+      return { ok: true };
+    } catch (err) {
+      return {
+        ok: false,
+        message: err.response?.data?.message || "Could not add box to cart",
+      };
+    }
+  };
+
   const updateItem = async (id, quantity) => {
     if (!user) return { ok: false, reason: "auth" };
     try {
@@ -132,6 +150,7 @@ export function CartProvider({ children }) {
         total,
         refresh,
         addItem,
+        addBox,
         updateItem,
         removeItem,
         clearCart,

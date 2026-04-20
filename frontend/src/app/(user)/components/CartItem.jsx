@@ -12,14 +12,24 @@ export default function CartItem({
 }) {
   const unit = Number(item.discount_price || item.price) || 0;
   const subtotal = unit * (Number(item.quantity) || 0);
+  const isBox = item.item_type === "box";
+  const selections = (() => {
+    if (!isBox || !item.selections_json) return [];
+    try {
+      const parsed = JSON.parse(item.selections_json);
+      return Array.isArray(parsed) ? parsed : [];
+    } catch {
+      return [];
+    }
+  })();
 
   return (
     <div className="cart-item">
       <div className="cart-item-img">
-        {item.image ? (
+        {item.image && !isBox ? (
           <img src={`${BASE}${item.image}`} alt={item.name} />
         ) : (
-          <div className="cart-no-img">NO IMAGE</div>
+          <div className="cart-no-img">{isBox ? "BOX" : "NO IMAGE"}</div>
         )}
       </div>
 
@@ -27,11 +37,15 @@ export default function CartItem({
         <div className="cart-item-top">
           <div>
             <span className="cart-item-brand">
-              {item.brand_name ?? item.category_name ?? "—"}
+              {isBox ? "Build Your Box" : (item.brand_name ?? item.category_name ?? "—")}
             </span>
             <h3 className="cart-item-name">{item.name}</h3>
             <div className="cart-item-meta">
-              <span>{item.size}</span>
+              {isBox ? (
+                <span>{selections.length} items selected</span>
+              ) : (
+                <span>{item.size}</span>
+              )}
             </div>
           </div>
           <button

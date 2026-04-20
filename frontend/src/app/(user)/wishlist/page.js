@@ -16,14 +16,14 @@ export default function WishlistPage() {
 
   const [wishlist, setWishlist]   = useState([]);
   const [loading, setLoading]     = useState(true);
-  const [removing, setRemoving]   = useState(null); // id being removed
+  const [removing, setRemoving]   = useState(null);
   const [addingId, setAddingId]   = useState(null);
   const [cartFeedback, setCartFeedback] = useState({ id: null, type: '', text: '' });
   const [selectorProduct, setSelectorProduct] = useState(null);
 
+
   const { addItem } = useCart();
 
-  // Redirect to login if not authenticated
   useEffect(() => {
     if (!authLoading && !user) {
       localStorage.setItem("returnTo", "/wishlist");

@@ -4,7 +4,7 @@ import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 import {
   LayoutDashboard, Package,
-  ShoppingBag, LogOut, Menu, X, Tag, Layers
+  ShoppingBag, LogOut, Menu, X, Tag, Layers, Gift
 } from "lucide-react";
 import "./admin.css";
 
@@ -13,6 +13,7 @@ const navItems = [
   { label: "Categories", href: "/admin/categories", icon: Tag           },
   { label: "Brands",     href: "/admin/brands",     icon: Layers          },
   { label: "Products",  href: "/admin/products",  icon: Package          },
+  { label: "Boxes",     href: "/admin/boxes",     icon: Gift             },
   { label: "Orders",    href: "/admin/orders",    icon: ShoppingBag      },
 ];
 
@@ -75,7 +76,7 @@ export default function AdminPanelLayout({ children }) {
       <aside className={`ad-sidebar ${collapsed ? "collapsed" : ""}`}>
 
         <div className="ad-sb-head">
-          {!collapsed && <span className="ad-logo">AURUM</span>}
+          {!collapsed && <span className="ad-logo">7EVEN</span>}
           <button
             className="ad-toggle"
             onClick={() => setCollapsed(!collapsed)}

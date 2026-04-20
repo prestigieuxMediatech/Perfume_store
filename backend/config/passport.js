@@ -15,6 +15,9 @@ async (accessToken, refreshToken, profile, done) => {
     const name      = profile.displayName;
     const avatar    = profile.photos[0].value;
     const google_id = profile.id;
+    const nameParts = (name || '').trim().split(/\s+/).filter(Boolean);
+    const firstName = nameParts[0] || '';
+    const lastName = nameParts.slice(1).join(' ');
 
     const [rows] = await pool.query(
       'SELECT * FROM users WHERE email = ?',
@@ -26,8 +29,8 @@ async (accessToken, refreshToken, profile, done) => {
 
       if (!user.google_id) {
         await pool.query(
-          'UPDATE users SET google_id = ?, avatar = ? WHERE id = ?',
-          [google_id, avatar, user.id]
+          'UPDATE users SET google_id = ?, avatar = ?, first_name = COALESCE(first_name, ?), last_name = COALESCE(last_name, ?) WHERE id = ?',
+          [google_id, avatar, firstName || null, lastName || null, user.id]
         );
       }
       return done(null, user);
@@ -35,9 +38,9 @@ async (accessToken, refreshToken, profile, done) => {
 
     const id = crypto.randomUUID();
     await pool.query(
-      `INSERT INTO users (id, name, email, google_id, avatar)
-       VALUES (?, ?, ?, ?, ?)`,
-      [id, name, email, google_id, avatar]
+      `INSERT INTO users (id, name, first_name, last_name, email, google_id, avatar)
+       VALUES (?, ?, ?, ?, ?, ?, ?)`,
+      [id, name, firstName || null, lastName || null, email, google_id, avatar]
     );
 
     const [newUser] = await pool.query(

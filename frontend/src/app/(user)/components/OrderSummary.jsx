@@ -20,16 +20,19 @@ export default function OrderSummary({ items, subtotal, shippingFee, grandTotal,
             return (
               <div key={item.id} className="checkout-item">
                 <div className="checkout-item-img">
-                  {item.image ? (
+                  {item.image && item.item_type !== "box" ? (
                     <img src={`${process.env.NEXT_PUBLIC_API_URL}${item.image}`} alt={item.name} />
                   ) : (
-                    <div className="checkout-no-img">NO IMAGE</div>
+                    <div className="checkout-no-img">{item.item_type === "box" ? "BOX" : "NO IMAGE"}</div>
                   )}
                 </div>
                 <div className="checkout-item-body">
                   <div className="checkout-item-name">{item.name}</div>
                 <div className="checkout-item-meta">
-                  {item.size} | Qty {item.quantity}
+                  {item.item_type === "box"
+                    ? `Custom box | Qty ${item.quantity}`
+                    : `${item.size} | Qty ${item.quantity}`
+                  }
                 </div>
               </div>
               <div className="checkout-item-price">

@@ -213,6 +213,8 @@
 }
 .ad-btn:hover         { background: rgba(201,168,76,0.06); }
 .ad-btn.primary       { background: rgba(201,168,76,0.1); border-color: #C9A84C; }
+.ad-btn.danger        { border-color: rgba(232,71,42,0.6); color: #E8472A; }
+.ad-btn.danger:hover  { background: rgba(232,71,42,0.08); }
 
 .ad-table             { width: 100%; border-collapse: collapse; }
 .ad-table-wrap        { width: 100%; overflow-x: auto; }

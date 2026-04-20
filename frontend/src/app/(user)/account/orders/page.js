@@ -12,6 +12,8 @@ export default function OrdersPage() {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [actionError, setActionError] = useState("");
+  const [cancellingId, setCancellingId] = useState(null);
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -36,7 +38,8 @@ export default function OrdersPage() {
           setError(data.message || "Failed to load orders");
           setOrders([]);
         } else {
-          setOrders(Array.isArray(data) ? data : []);
+          const items = Array.isArray(data) ? data : [];
+          setOrders(items);
         }
       } catch (err) {
         setError("Failed to load orders");
@@ -48,6 +51,39 @@ export default function OrdersPage() {
 
     fetchOrders();
   }, [user]);
+
+  const handleCancel = async (orderId) => {
+    if (!orderId || !user) return;
+    const ok = window.confirm("Are you sure you want to cancel this order?");
+    if (!ok) return;
+
+    setActionError("");
+    setCancellingId(orderId);
+    try {
+      const token = localStorage.getItem("token");
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/auth/orders/${orderId}/cancel`,
+        {
+          method: "PUT",
+          headers: { Authorization: `Bearer ${token}` }
+        }
+      );
+      const data = await res.json();
+      if (!res.ok) {
+        setActionError(data.message || "Failed to cancel order");
+        return;
+      }
+      setOrders((prev) =>
+        prev.map((order) =>
+          order.id === orderId ? { ...order, status: data.status || "cancelled" } : order
+        )
+      );
+    } catch (err) {
+      setActionError("Failed to cancel order");
+    } finally {
+      setCancellingId(null);
+    }
+  };
 
   if (authLoading) {
     return (
@@ -83,6 +119,9 @@ export default function OrdersPage() {
 
       <section className="orders-content">
         <div className="orders-wrap">
+          {actionError ? (
+            <div className="orders-action-error">{actionError}</div>
+          ) : null}
           {loading ? (
             <div className="orders-skeletons">
               {Array.from({ length: 2 }).map((_, i) => (
@@ -109,7 +148,12 @@ export default function OrdersPage() {
           ) : (
             <div className="orders-list">
               {orders.map((order) => (
-                <OrderCard key={order.id} order={order} />
+                <OrderCard
+                  key={order.id}
+                  order={order}
+                  onCancel={handleCancel}
+                  isCancelling={cancellingId === order.id}
+                />
               ))}
             </div>
           )}

@@ -1,181 +1,172 @@
 ﻿"use client";
-import React, { useEffect, useState } from "react";
+import React from "react";
 
 const HERO_PRODUCTS = [
   {
     id: 1,
-    family: "Floral · Oriental",
+    family: "Floral / Oriental",
     name: "Velours Noir",
-    notes: "Black rose, oud, amber & dark vanilla",
-    price: "₹18,500",
+    notes: "Black rose, oud, amber and dark vanilla",
+    price: "INR 18,500",
     img: "/one.webp",
   },
   {
     id: 2,
-    family: "Woody · Spiced",
-    name: "Santal Impérial",
-    notes: "Mysore sandalwood, cardamom & leather",
-    price: "₹22,000",
+    family: "Woody / Spiced",
+    name: "Santal Imperial",
+    notes: "Mysore sandalwood, cardamom and leather",
+    price: "INR 22,000",
     img: "/two.jpg",
   },
   {
     id: 3,
-    family: "Aquatic · Fresh",
+    family: "Aquatic / Fresh",
     name: "Brume d'Aube",
-    notes: "Sea salt, iris, white cedar & musk",
-    price: "₹15,800",
+    notes: "Sea salt, iris, white cedar and musk",
+    price: "INR 15,800",
     img: "/three.jpg",
   },
   {
     id: 4,
-    family: "Gourmand · Warm",
-    name: "Or Épicé",
-    notes: "Saffron, tonka bean, honey & vetiver",
-    price: "₹26,500",
+    family: "Gourmand / Warm",
+    name: "Or Epice",
+    notes: "Saffron, tonka bean, honey and vetiver",
+    price: "INR 26,500",
     img: "/four.webp",
   },
 ];
 
-const chunk = (items, size) => {
-  const result = [];
-  for (let i = 0; i < items.length; i += size) {
-    result.push(items.slice(i, i + size));
-  }
-  return result;
-};
-
 const GlobalStyles = () => (
   <style>{`
-    /* €€ Fade + rise entrance €€ */
-    @keyframes fadeRise {
-      from { opacity: 0; transform: translateY(32px); }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(22px); }
       to   { opacity: 1; transform: translateY(0); }
     }
-
-    /* €€ Shimmer line €€ */
-    @keyframes shimmer {
-      0%   { background-position: -400px 0; }
-      100% { background-position: 400px 0; }
-    }
-
-    /* €€ Line draw €€ */
-    @keyframes lineDraw {
-      from { width: 0; opacity: 0; }
-      to   { width: 60px; opacity: 1; }
+    @keyframes shimmerLine {
+      from { transform: translateX(-100%); }
+      to   { transform: translateX(200%); }
     }
 
     .hero-section {
-      min-height: clamp(640px, 92vh, 920px);
-      padding: 6rem 4rem 3.5rem;
-      background: var(--dark);
-      color: var(--cream);
+      min-height: clamp(580px, 84vh, 820px);
+      padding: 6.5rem 5rem 4rem;
+      background: var(--bg);
+      color: var(--text);
       display: flex;
       align-items: center;
-      overflow: hidden;
       position: relative;
+      overflow: hidden;
     }
 
+    /* radial glow backdrop */
     .hero-section::before {
       content: '';
       position: absolute;
       inset: 0;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      background:
+        radial-gradient(ellipse at 8% -10%, rgba(199,164,90,0.13), transparent 48%),
+        radial-gradient(ellipse at 92% 15%, rgba(199,164,90,0.06), transparent 52%);
       pointer-events: none;
       z-index: 0;
-      opacity: 0.55;
+    }
+
+    /* diagonal rule */
+    .hero-section::after {
+      content: '';
+      position: absolute; inset: 0; z-index: 0; pointer-events: none;
+      background: repeating-linear-gradient(
+        -52deg, transparent, transparent 110px,
+        rgba(199,164,90,.012) 110px, rgba(199,164,90,.012) 111px
+      );
+    }
+
+    :root[data-theme="light"] .hero-section::before {
+      background:
+        radial-gradient(ellipse at 8% -10%, rgba(168,112,48,0.11), transparent 48%),
+        radial-gradient(ellipse at 92% 15%, rgba(168,112,48,0.06), transparent 52%);
     }
 
     .hero-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 3rem;
-      align-items: center;
       width: 100%;
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 4rem;
+      align-items: center;
       position: relative;
       z-index: 1;
     }
 
-    .hero-left { display: flex; flex-direction: column; gap: 2rem; }
+    /* ── LEFT ── */
+    .hero-left { display: flex; flex-direction: column; gap: 1.5rem; }
 
     .hero-eyebrow {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
       font-family: 'Cinzel', serif;
-      font-size: 0.65rem;
-      letter-spacing: 0.35em;
-      color: var(--gold);
+      font-size: 0.58rem;
+      letter-spacing: 0.36em;
       text-transform: uppercase;
-      animation: fadeRise 0.9s ease both;
-      animation-delay: 0.1s;
+      color: var(--gold);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.85rem;
+      animation: fadeUp 0.8s ease both;
     }
-
-    .hero-eyebrow::before {
+    .hero-eyebrow::before,
+    .hero-eyebrow::after {
       content: '';
-      display: block;
-      height: 1px;
+      width: 28px; height: 1px;
       background: var(--gold);
-      animation: lineDraw 0.8s ease both;
-      animation-delay: 0.2s;
+      opacity: .7;
     }
 
     .hero-heading {
       font-family: 'Cinzel', serif;
       font-weight: 300;
-      font-size: clamp(2.8rem, 5.5vw, 5.5rem);
-      line-height: 1.12;
+      font-size: clamp(2.4rem, 4.6vw, 4.6rem);
+      line-height: 1.1;
       letter-spacing: 0.06em;
-      color: var(--cream);
-      animation: fadeRise 0.9s ease both;
-      animation-delay: 0.3s;
+      color: var(--text);
+      animation: fadeUp 0.8s ease both .08s;
     }
-
-    .hero-heading .accent {
+    .hero-heading em {
       font-family: 'Cormorant Garamond', serif;
       font-style: italic;
       font-weight: 300;
       color: var(--gold-light);
       letter-spacing: 0.04em;
-    }
-
-    .hero-divider {
-      width: 60px;
-      height: 1px;
-      background: linear-gradient(90deg, var(--gold), transparent);
-      animation: lineDraw 1s ease both;
-      animation-delay: 0.5s;
+      display: block;
     }
 
     .hero-sub {
       font-family: 'Cormorant Garamond', serif;
-      font-style: italic;
-      font-weight: 550;
       font-size: 1.05rem;
-      line-height: 1.75;
-      color: var(--cream);
-      max-width: 380px;
-      border-left: 1px solid rgba(201,168,76,0.3);
-      padding-left: 1.25rem;
-      animation: fadeRise 0.9s ease both;
-      animation-delay: 0.5s;
+      line-height: 1.85;
+      color: var(--text-subtle);
+      max-width: 440px;
+      animation: fadeUp 0.8s ease both .16s;
     }
 
     .hero-cta {
       display: flex;
-      gap: 1.5rem;
+      gap: 1rem;
       align-items: center;
-      animation: fadeRise 0.9s ease both;
-      animation-delay: 0.7s;
+      animation: fadeUp 0.8s ease both .24s;
     }
 
+    /* ── Metrics strip ── */
     .hero-metrics {
-      display: flex;
-      gap: 2.5rem;
-      padding-top: 2rem;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 0;
+      padding-top: 1.8rem;
       border-top: 1px solid var(--border);
-      animation: fadeRise 0.9s ease both;
-      animation-delay: 0.9s;
+      animation: fadeUp 0.8s ease both .32s;
     }
+    .hero-metric {
+      padding-right: 1.4rem;
+      border-right: 1px solid var(--border);
+    }
+    .hero-metric:last-child { border-right: none; padding-left: 1.4rem; padding-right: 0; }
+    .hero-metric:nth-child(2) { padding-left: 1.4rem; }
 
     .metric-value {
       font-family: 'Cormorant Garamond', serif;
@@ -184,264 +175,324 @@ const GlobalStyles = () => (
       color: var(--gold);
       line-height: 1;
     }
-
     .metric-label {
       font-family: 'Cinzel', serif;
-      font-size: 0.55rem;
+      font-size: 0.5rem;
       letter-spacing: 0.2em;
       text-transform: uppercase;
-      color: var(--text-muted);
-      margin-top: 0.35rem;
+      color: var(--text-subtle);
+      margin-top: 0.4rem;
     }
 
+    /* ── RIGHT ── */
     .hero-right {
-      position: relative;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      animation: fadeRise 1.1s ease both;
-      animation-delay: 0.4s;
-    }
-
-    .hero-carousel {
-      width: 100%;
-      max-width: 540px;
-      border: 1px solid var(--border);
-      background: var(--dark2);
-      padding: 1.5rem;
-      position: relative;
-      overflow: hidden;
-      box-shadow: 0 24px 60px rgba(0,0,0,0.35);
-    }
-
-    .hero-carousel::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: radial-gradient(circle at 0% 0%, rgba(201,168,76,0.14), transparent 55%);
-      pointer-events: none;
-    }
-
-    .hero-carousel-viewport {
-      overflow: hidden;
-      position: relative;
-      z-index: 1;
-    }
-
-    .hero-carousel-track {
-      display: flex;
-      transition: transform 0.7s ease;
-      gap: 1.2rem;
-    }
-
-    .hero-slide {
-      min-width: 100%;
-    }
-
-    .hero-slide-grid {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 1.2rem;
-    }
-
-    .hero-card {
-      background: var(--dark3);
-      border: 1px solid var(--border);
-      overflow: hidden;
-    }
-
-    .hero-card-img {
-      aspect-ratio: 3/4;
-      overflow: hidden;
-      background: var(--dark3);
-    }
-
-    .hero-card-img img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-    }
-
-    .hero-card-body {
-      padding: 0.9rem 0.9rem 1rem;
       display: flex;
       flex-direction: column;
-      gap: 0.35rem;
+      gap: 1rem;
+      animation: fadeUp 0.9s ease both .12s;
     }
 
-    .hero-card-family {
+    /* ── Feature card ── */
+    .hero-feature {
+      position: relative;
+      border-radius: 14px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      box-shadow: 0 20px 50px rgba(0,0,0,0.28);
+      display: grid;
+      grid-template-columns: 200px 1fr;
+      align-items: stretch;
+      transition: border-color .35s, box-shadow .35s;
+    }
+    .hero-feature:hover {
+      border-color: var(--border-mid);
+      box-shadow: 0 24px 60px rgba(0,0,0,0.38);
+    }
+
+    /* shimmer sweep on hover */
+    .hero-feature::before {
+      content: '';
+      position: absolute; inset: 0; z-index: 2; pointer-events: none;
+      background: linear-gradient(105deg, transparent 30%, rgba(199,164,90,.08) 50%, transparent 70%);
+      transform: translateX(-100%);
+      transition: transform .7s ease;
+    }
+    .hero-feature:hover::before { transform: translateX(100%); }
+
+    .hero-feature-img {
+      position: relative;
+      overflow: hidden;
+      background: var(--surface-2);
+    }
+    .hero-feature-img img {
+      width: 100%; height: 100%;
+      object-fit: cover; display: block;
+      transition: transform .6s cubic-bezier(.25,.46,.45,.94), filter .6s;
+      filter: brightness(.88) saturate(.9);
+    }
+    .hero-feature:hover .hero-feature-img img {
+      transform: scale(1.05);
+      filter: brightness(.96) saturate(1);
+    }
+
+    /* gold top-edge line */
+    .hero-feature-img::after {
+      content: '';
+      position: absolute; top: 0; left: 0;
+      height: 2px; width: 0;
+      background: var(--gold);
+      transition: width .55s ease;
+      z-index: 1;
+    }
+    .hero-feature:hover .hero-feature-img::after { width: 100%; }
+
+    .hero-feature-info {
+      padding: 1.5rem 1.4rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 0.45rem;
+      border-left: 1px solid var(--border);
+    }
+
+    .hero-feature-badge {
+      display: inline-block;
       font-family: 'Cinzel', serif;
-      font-size: 0.45rem;
-      letter-spacing: 0.25em;
+      font-size: 0.44rem;
+      letter-spacing: 0.28em;
       text-transform: uppercase;
-      color: rgba(201,168,76,0.7);
+      color: var(--gold);
+      border: 1px solid var(--border-mid);
+      padding: .22rem .7rem;
+      align-self: flex-start;
+      margin-bottom: .1rem;
     }
 
-    .hero-card-name {
+    .hero-feature-name {
       font-family: 'Cormorant Garamond', serif;
-      font-size: 1rem;
-      color: var(--cream);
+      font-size: 1.45rem;
+      font-weight: 300;
+      color: var(--text);
       letter-spacing: 0.02em;
+      line-height: 1.2;
+      transition: color .3s;
     }
+    .hero-feature:hover .hero-feature-name { color: var(--gold-light); }
 
-    .hero-card-notes {
+    .hero-feature-notes {
       font-family: 'Cormorant Garamond', serif;
       font-style: italic;
-      font-size: 0.75rem;
-      color: var(--text-muted);
-      line-height: 1.4;
+      font-size: 0.85rem;
+      color: var(--text-subtle);
+      line-height: 1.55;
     }
 
-    .hero-card-price {
+    .hero-feature-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: .4rem;
+      padding-top: .75rem;
+      border-top: 1px solid var(--border);
+    }
+
+    .hero-feature-price {
       font-family: 'Cinzel', serif;
-      font-size: 0.65rem;
+      font-size: 0.7rem;
       letter-spacing: 0.18em;
       color: var(--gold);
+    }
+
+    .hero-feature-cta {
+      font-family: 'Cinzel', serif;
+      font-size: 0.5rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--text-faint);
+      background: none;
+      border: 1px solid var(--border);
+      padding: .32rem .8rem;
+      cursor: pointer;
+      transition: border-color .25s, color .25s;
+    }
+    .hero-feature-cta:hover { border-color: var(--border-mid); color: var(--gold); }
+
+    /* ── Thumb strip ── */
+    .hero-thumbs {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.75rem;
+    }
+
+    .hero-thumb {
+      position: relative;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+      background: var(--surface);
+      cursor: pointer;
+      transition: border-color .3s, transform .3s, box-shadow .3s;
+    }
+    .hero-thumb:hover {
+      border-color: var(--border-mid);
+      transform: translateY(-3px);
+      box-shadow: 0 12px 28px rgba(0,0,0,.3);
+    }
+    .hero-thumb::before {
+      content: '';
+      position: absolute; top: 0; left: 0;
+      height: 1px; width: 0;
+      background: var(--gold);
+      transition: width .45s ease; z-index: 1;
+    }
+    .hero-thumb:hover::before { width: 100%; }
+
+    .hero-thumb-img {
+      width: 100%;
+      aspect-ratio: 3 / 2;
+      background: var(--surface-2);
+      overflow: hidden;
+    }
+    .hero-thumb-img img {
+      width: 100%; height: 100%;
+      object-fit: cover; display: block;
+      transition: transform .6s ease, filter .6s;
+      filter: brightness(.85) saturate(.88);
+    }
+    .hero-thumb:hover .hero-thumb-img img {
+      transform: scale(1.06);
+      filter: brightness(.96) saturate(1);
+    }
+
+    .hero-thumb-info {
+      padding: .6rem .7rem .65rem;
+      border-top: 1px solid var(--border);
+    }
+
+    .hero-thumb-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 0.9rem;
+      color: var(--text);
+      line-height: 1.2;
+      transition: color .3s;
+    }
+    .hero-thumb:hover .hero-thumb-name { color: var(--gold-light); }
+
+    .hero-thumb-family {
+      font-family: 'Cinzel', serif;
+      font-size: 0.42rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--text-faint);
       margin-top: 0.2rem;
     }
 
-    .hero-dots {
-      display: flex;
-      gap: 6px;
-      margin-top: 1rem;
-      justify-content: center;
-    }
-
-    .hero-dot {
-      width: 5px;
-      height: 5px;
-      border-radius: 999px;
-      background: rgba(var(--text-rgb),0.2);
-      transition: width 0.35s ease, background 0.35s ease;
-    }
-
-    .hero-dot.active {
-      width: 22px;
-      background: var(--gold);
-    }
-
-    @media (min-width: 1024px) {
-      .hero-section {
-        min-height: clamp(640px, 86vh, 880px);
-        padding: 5.5rem 4rem 3rem;
-      }
+    /* ── Responsive ── */
+    @media (max-width: 1100px) {
+      .hero-section { padding: 6rem 3rem 4rem; }
+      .hero-grid { grid-template-columns: 1fr; gap: 3rem; }
+      .hero-right { max-width: 580px; }
     }
 
     @media (max-width: 768px) {
-      .hero-section { padding: 5rem 1.5rem 3rem; }
-      .hero-grid { grid-template-columns: 1fr; }
-      .hero-right { margin-top: 2rem; }
-      .hero-slide-grid { grid-template-columns: 1fr; }
+      .hero-section { padding: 5.5rem 1.5rem 3rem; }
+      .hero-feature { grid-template-columns: 140px 1fr; }
+      .hero-thumbs { grid-template-columns: repeat(3, 1fr); gap: .5rem; }
+      .hero-thumb-info { padding: .5rem; }
+      .hero-thumb-name { font-size: .82rem; }
     }
 
-    @media (prefers-reduced-motion: reduce) {
-      *, *::before, *::after {
-        animation-duration: 0.001ms !important;
-        animation-iteration-count: 1 !important;
-        transition-duration: 0.001ms !important;
-        scroll-behavior: auto !important;
-      }
+    @media (max-width: 480px) {
+      .hero-feature { grid-template-columns: 1fr; }
+      .hero-feature-img { aspect-ratio: 16 / 9; max-height: 200px; }
+      .hero-feature-info { border-left: none; border-top: 1px solid var(--border); }
+      .hero-thumbs { grid-template-columns: repeat(3, 1fr); }
+      .hero-metric:nth-child(2) { padding-left: .9rem; }
+      .hero-metric { padding-right: .9rem; }
     }
   `}</style>
 );
 
 export default function Hero() {
-  const slides = chunk(HERO_PRODUCTS, 2);
-  const [index, setIndex] = useState(0);
-
-  useEffect(() => {
-    if (slides.length <= 1) return undefined;
-    const id = setInterval(() => {
-      setIndex((prev) => (prev + 1) % slides.length);
-    }, 3500);
-    return () => clearInterval(id);
-  }, [slides.length]);
+  const featured = HERO_PRODUCTS[0];
+  const thumbs   = HERO_PRODUCTS.slice(1, 4);
 
   return (
     <>
       <GlobalStyles />
       <section className="hero-section">
         <div className="hero-grid">
+
+          {/* ── LEFT ── */}
           <div className="hero-left">
-            <div className="hero-eyebrow">
-              Maison de Parfum · Est. 1987
-            </div>
+            <div className="hero-eyebrow">Maison de Parfum — Est. 1987</div>
 
             <h1 className="hero-heading">
-              WHERE<br />
-              <span className="accent">SCENT</span><br />
-              BECOMES<br />
-              ARTISTRY
+              A Signature of
+              <em>Quiet Luxury</em>
             </h1>
 
-            <div className="hero-divider" />
-
             <p className="hero-sub">
-              "A singular journey through rare botanical gardens
-              and ancient trade routes — bottled in silence."
+              Crafted in small batches with rare botanicals and precise maceration,
+              each fragrance is composed to linger with elegance, not noise.
             </p>
 
             <div className="hero-cta">
-              <button className="btn-primary">
-                Explore Collection 
-              </button>
+              <button className="btn-primary">Explore Collection</button>
               
             </div>
 
             <div className="hero-metrics">
-              <div>
+              <div className="hero-metric">
                 <div className="metric-value">37</div>
                 <div className="metric-label">Years of Excellence</div>
               </div>
-              <div>
-                <div className="metric-value">4</div>
-                <div className="metric-label">Signature Fragrances</div>
-              </div>
-              <div>
+              <div className="hero-metric">
                 <div className="metric-value">150+</div>
-                <div className="metric-label">Rare Ingredients</div>
+                <div className="metric-label">Rare Botanicals</div>
+              </div>
+              <div className="hero-metric">
+                <div className="metric-value">4</div>
+                <div className="metric-label">Signature Families</div>
               </div>
             </div>
           </div>
 
+          {/* ── RIGHT ── */}
           <div className="hero-right">
-            <div className="hero-carousel">
-              <div className="hero-carousel-viewport">
-                <div
-                  className="hero-carousel-track"
-                  style={{ transform: `translateX(-${index * 100}%)` }}
-                >
-                  {slides.map((group, slideIndex) => (
-                    <div className="hero-slide" key={`slide-${slideIndex}`}>
-                      <div className="hero-slide-grid">
-                        {group.map((item) => (
-                          <div className="hero-card" key={item.id}>
-                            <div className="hero-card-img">
-                              <img src={item.img} alt={item.name} />
-                            </div>
-                            <div className="hero-card-body">
-                              <div className="hero-card-family">{item.family}</div>
-                              <div className="hero-card-name">{item.name}</div>
-                              <div className="hero-card-notes">{item.notes}</div>
-                              <div className="hero-card-price">{item.price}</div>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  ))}
+
+            {/* Featured card — horizontal layout, shorter image */}
+            <div className="hero-feature">
+              <div className="hero-feature-img">
+                <img src={featured.img} alt={featured.name} />
+              </div>
+              <div className="hero-feature-info">
+                <div className="hero-feature-badge">{featured.family}</div>
+                <div className="hero-feature-name">{featured.name}</div>
+                <div className="hero-feature-notes">{featured.notes}</div>
+                <div className="hero-feature-footer">
+                  <div className="hero-feature-price">{featured.price}</div>
+                  <button className="hero-feature-cta">View →</button>
                 </div>
               </div>
-              <div className="hero-dots">
-                {slides.map((_, dotIndex) => (
-                  <span
-                    key={`dot-${dotIndex}`}
-                    className={`hero-dot ${dotIndex === index ? "active" : ""}`}
-                  />
-                ))}
-              </div>
             </div>
+
+            {/* Three thumbnails */}
+            <div className="hero-thumbs">
+              {thumbs.map(p => (
+                <div className="hero-thumb" key={p.id}>
+                  <div className="hero-thumb-img">
+                    <img src={p.img} alt={p.name} />
+                  </div>
+                  <div className="hero-thumb-info">
+                    <div className="hero-thumb-name">{p.name}</div>
+                    <div className="hero-thumb-family">{p.family}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
           </div>
         </div>
       </section>

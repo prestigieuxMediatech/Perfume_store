@@ -3,6 +3,15 @@ const bcrypt = require('bcryptjs');
 const pool = require('../config/db');
 const saveImage = require('../config/saveImage');
 
+const slugifyGroup = (value) => {
+  if (!value) return null;
+  return String(value)
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/(^-|-$)/g, '');
+};
+
 exports.login = async (req, res) => {
     try {
         const { email, password } = req.body;
@@ -282,7 +291,7 @@ exports.deleteBrand = async (req, res) => {
 
 exports.addProduct = async (req, res) => {
   try {
-    const { name, description, category_id, brand_id, variants } = req.body;
+    const { name, description, category_id, brand_id, variants, group_name } = req.body;
 
     // Validation
     if (!name) {
@@ -318,10 +327,11 @@ exports.addProduct = async (req, res) => {
 
     // Insert product
     const productId = require('crypto').randomUUID();
+    const finalGroupName = group_name ? group_name.trim() : slugifyGroup(name);
     await pool.query(
-      `INSERT INTO products (id, name, description, category_id, brand_id)
-      VALUES (?, ?, ?, ?, ?)`,
-      [productId, name, description || null, category_id || null, brand_id || null]
+      `INSERT INTO products (id, name, description, category_id, brand_id, group_name)
+      VALUES (?, ?, ?, ?, ?, ?)`,
+      [productId, name, description || null, category_id || null, brand_id || null, finalGroupName || null]
     );
 
     // Insert variants
@@ -359,6 +369,7 @@ exports.getProducts = async (req, res) => {
         p.id,
         p.name,
         p.description,
+        p.group_name,
         p.is_active,
         p.created_at,
         c.name       AS category_name,
@@ -435,7 +446,7 @@ exports.getProductById = async (req, res) => {
 exports.updateProduct = async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, description, category_id, brand_id, variants, remove_images } = req.body;
+    const { name, description, category_id, brand_id, variants, remove_images, group_name } = req.body;
 
     if (!name) {
       return res.status(400).json({ message: 'Product name is required' });
@@ -450,11 +461,12 @@ exports.updateProduct = async (req, res) => {
     }
 
     // Update product
+    const finalGroupName = group_name ? group_name.trim() : slugifyGroup(name);
     await pool.query(`
       UPDATE products
-      SET name = ?, description = ?, category_id = ?, brand_id = ?
+      SET name = ?, description = ?, category_id = ?, brand_id = ?, group_name = ?
       WHERE id = ?
-    `, [name, description || null, category_id || null, brand_id || null, id]);
+    `, [name, description || null, category_id || null, brand_id || null, finalGroupName || null, id]);
 
     // Replace variants — delete old ones and insert new
     if (variants) {

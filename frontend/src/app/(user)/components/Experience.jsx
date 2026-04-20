@@ -145,7 +145,7 @@ const Styles = () => (
     }
 
     .experience-right::before {
-      content: 'AURUM';
+      content: '7EVEN';
       position: absolute;
       right: -70px;
       top: 50%;
@@ -321,7 +321,7 @@ export default function Experience() {
             <div className="experience-guest">
               <span className="experience-guest-name">Ananya R.</span>
               <span className="experience-guest-meta">
-                Private client · Aurum Bespoke No. 07
+                Private client · 7EVEN Bespoke No. 07
               </span>
             </div>
             <div className="experience-badge">

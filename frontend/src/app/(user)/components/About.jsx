@@ -1,5 +1,6 @@
 "use client";
 import React from "react";
+import useReveal from "../hooks/useReveal";
 
 const Keyframes = () => (
   <style>{`
@@ -328,28 +329,8 @@ const Keyframes = () => (
   `}</style>
 );
 
-/* Intersection Observer hook for scroll reveals */
-function useReveal() {
-  React.useEffect(() => {
-    const els = document.querySelectorAll(".about-reveal");
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((e) => {
-          if (e.isIntersecting) {
-            e.target.classList.add("visible");
-            observer.unobserve(e.target);
-          }
-        });
-      },
-      { threshold: 0.15 }
-    );
-    els.forEach((el) => observer.observe(el));
-    return () => observer.disconnect();
-  }, []);
-}
-
 export default function About() {
-  useReveal();
+  useReveal({ selector: ".about-reveal", visibleClass: "visible", threshold: 0.15 });
 
   return (
     <>
@@ -357,7 +338,7 @@ export default function About() {
       <section className="about-section" id="about">
 
         {/* Background watermark */}
-        <span className="about-watermark">AURUM</span>
+        <span className="about-watermark">7EVEN</span>
 
         <div className="about-grid">
 

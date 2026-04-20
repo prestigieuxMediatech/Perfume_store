@@ -7,12 +7,18 @@ import Link from "next/link";
 
 const BASE         = process.env.NEXT_PUBLIC_API_URL;
 const SIZE_OPTIONS = ["25ml", "50ml", "75ml", "100ml", "150ml", "200ml"];
+const slugifyGroup = (value) => value
+  .toLowerCase()
+  .trim()
+  .replace(/[^a-z0-9]+/g, '-')
+  .replace(/(^-|-$)/g, '');
 
 export default function AddProduct() {
   const router = useRouter();
 
   const [form, setForm] = useState({
     name:        "",
+    group_name:  "",
     description: "",
     category_id: "",
     brand_id:    "",
@@ -29,6 +35,7 @@ export default function AddProduct() {
   const [serverError, setServerError] = useState("");
   const [brands, setBrands]         = useState([]);
   const [filteredBrands, setFilteredBrands] = useState([]);
+  const [groupTouched, setGroupTouched] = useState(false);
 
   const fileInputRef = useRef(null);
 
@@ -48,7 +55,6 @@ export default function AddProduct() {
       .catch(() => setCategories([]));
   }, []);
 
-  // Add this useEffect
   useEffect(() => {
     if (form.category_id) {
       setFilteredBrands(brands.filter(b => b.category_id === form.category_id));
@@ -58,14 +64,22 @@ export default function AddProduct() {
     }
   }, [form.category_id, brands]);
 
-  // ── Form change ────────────────────────────────────────
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setForm({ ...form, [name]: value });
+    if (name === "name" && !groupTouched) {
+      setForm({ ...form, name: value, group_name: value ? slugifyGroup(value) : "" });
+    } else {
+      setForm({ ...form, [name]: value });
+    }
     setErrors({ ...errors, [name]: "" });
   };
 
-  // ── Variant handlers ───────────────────────────────────
+  const handleGroupChange = (e) => {
+    setGroupTouched(true);
+    setForm({ ...form, group_name: e.target.value });
+    setErrors({ ...errors, group_name: "" });
+  };
+
   const handleVariantChange = (index, field, value) => {
     const updated = variants.map((v, i) =>
       i === index ? { ...v, [field]: value } : v
@@ -83,7 +97,6 @@ export default function AddProduct() {
     setVariants(variants.filter((_, i) => i !== index));
   };
 
-  // ── Image handlers ─────────────────────────────────────
   const handleImageSelect = (e) => {
     const files = Array.from(e.target.files);
     if (images.length + files.length > 3) {
@@ -101,7 +114,6 @@ export default function AddProduct() {
     setImages(updated);
   };
 
-  // ── Validate ───────────────────────────────────────────
   const validate = () => {
     const newErrors = {};
     if (!form.name.trim()) newErrors.name = "Product name is required";
@@ -119,7 +131,6 @@ export default function AddProduct() {
     return Object.keys(newErrors).length === 0;
   };
 
-  // ── Submit ─────────────────────────────────────────────
   const handleSubmit = async (e) => {
     e.preventDefault();
     setServerError("");
@@ -129,6 +140,7 @@ export default function AddProduct() {
     try {
       const formData = new FormData();
       formData.append("name",        form.name);
+      if (form.group_name) formData.append("group_name", form.group_name);
       formData.append("description", form.description);
       if (form.category_id) formData.append("category_id", form.category_id);
       if (form.brand_id) formData.append("brand_id", form.brand_id);
@@ -179,6 +191,21 @@ export default function AddProduct() {
             value={form.name} onChange={handleChange}
           />
           {errors.name && <p style={{ color:"#E8472A", fontSize:"0.68rem", marginTop:"0.3rem" }}>{errors.name}</p>}
+        </div>
+
+        {/* Group Name */}
+        <div style={{ marginBottom:"1.2rem" }}>
+          <label className="ad-label">
+            Group Name
+            <span style={{ color:"#4a4540", fontSize:"0.58rem", textTransform:"none", marginLeft:"0.4rem" }}>
+              — same value for related types (perfume/mist/wash)
+            </span>
+          </label>
+          <input
+            className="ad-input" type="text" name="group_name"
+            placeholder="e.g. fogg-impressio"
+            value={form.group_name} onChange={handleGroupChange}
+          />
         </div>
 
         {/* Description */}
