@@ -13,10 +13,6 @@ export default function Orders() {
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [deletingId, setDeletingId] = useState(null);
 
-  const getToken = () => (
-    typeof window !== "undefined" ? localStorage.getItem("adminToken") : ""
-  );
-
   const formatMoney = (value) =>
     `\u20B9${Number(value || 0).toLocaleString("en-IN")}`;
 
@@ -33,7 +29,7 @@ export default function Orders() {
         : `/api/admin/orders?status=${filter}`;
       const res  = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}${url}`,
-        { headers: { Authorization: `Bearer ${getToken()}` } }
+        { credentials: "include" }
       );
       const data = await res.json();
       setOrders(Array.isArray(data) ? data : []);
@@ -50,9 +46,9 @@ export default function Orders() {
       {
         method:  "PUT",
         headers: {
-          "Content-Type": "application/json",
-          Authorization:  `Bearer ${getToken()}`
+          "Content-Type": "application/json"
         },
+        credentials: "include",
         body: JSON.stringify({ status })
       }
     );
@@ -67,7 +63,7 @@ export default function Orders() {
     try {
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/api/admin/orders/${id}`,
-        { method: "DELETE", headers: { Authorization: `Bearer ${getToken()}` } }
+        { method: "DELETE", credentials: "include" }
       );
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
@@ -92,7 +88,7 @@ export default function Orders() {
     try {
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/api/admin/orders/${orderId}`,
-        { headers: { Authorization: `Bearer ${getToken()}` } }
+        { credentials: "include" }
       );
       if (!res.ok) throw new Error("Failed to load order");
       const data = await res.json();

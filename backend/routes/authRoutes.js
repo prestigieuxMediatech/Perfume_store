@@ -5,6 +5,7 @@ const {
   login,
   googleCallback,
   getMe,
+  logout,
   addProductReview,
   addToWishlist,
   getWishlist,
@@ -38,12 +39,13 @@ router.get(
   '/google/callback',
   passport.authenticate('google', {
     session: false,
-    failureRedirect: `${process.env.FRONTEND_URL}/login?error=auth_failed`
+    failureRedirect: `${process.env.FRONTEND_URL}/auth/callback?error=auth_failed`
   }),
   googleCallback
 );
 
 router.get('/me', auth, getMe);
+router.post('/logout', logout);
 
 router.get('/wishlist',        auth, getWishlist);
 router.get('/wishlist/ids',    auth, getWishlistIds);

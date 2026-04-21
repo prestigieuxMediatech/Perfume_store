@@ -28,10 +28,9 @@ export default function OrdersPage() {
       setLoading(true);
       setError("");
       try {
-        const token = localStorage.getItem("token");
         const res = await fetch(
           `${process.env.NEXT_PUBLIC_API_URL}/api/auth/orders`,
-          { headers: { Authorization: `Bearer ${token}` } }
+          { credentials: "include" }
         );
         const data = await res.json();
         if (!res.ok) {
@@ -60,12 +59,11 @@ export default function OrdersPage() {
     setActionError("");
     setCancellingId(orderId);
     try {
-      const token = localStorage.getItem("token");
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/api/auth/orders/${orderId}/cancel`,
         {
           method: "PUT",
-          headers: { Authorization: `Bearer ${token}` }
+          credentials: "include"
         }
       );
       const data = await res.json();

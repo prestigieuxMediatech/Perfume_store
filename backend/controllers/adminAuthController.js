@@ -2,6 +2,7 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const pool = require('../config/db');
 const saveImage = require('../config/saveImage');
+const { clearAuthCookie, setAuthCookie } = require('../utils/authCookies');
 const {
   parseProductDetails,
   stringifyProductDetails,
@@ -35,14 +36,14 @@ exports.login = async (req, res) => {
         );
 
         if (rows.length === 0) {
-            return res.status(400).json({ message: 'Admin does not exist' });
+            return res.status(401).json({ message: 'Invalid email or password' });
         }
 
         const admin = rows[0];
 
         const isMatch = await bcrypt.compare(password, admin.password);
         if (!isMatch) {
-            return res.status(400).json({ message: 'Incorrect password' });
+            return res.status(401).json({ message: 'Invalid email or password' });
         }
 
         const Admintoken = jwt.sign(
@@ -55,10 +56,10 @@ exports.login = async (req, res) => {
             process.env.JWT_SECRET,
             { expiresIn: '7d' }
         );
+        setAuthCookie(res, Admintoken, 'admin');
 
         res.status(200).json({
             message: 'Login successful',
-            Admintoken,
             admin: {
                 id: admin.id,
                 name: admin.name,
@@ -68,11 +69,32 @@ exports.login = async (req, res) => {
     } catch (err) {
         console.error('Login error:', err);
         res.status(500).json({
-            message: 'Server Error',
-            error: err.message,
-            stack: err.stack
+            message: 'Server Error'
         });
     }
+};
+
+exports.getAdminMe = async (req, res) => {
+  try {
+    const [rows] = await pool.query(
+      `SELECT id, name, email FROM admins WHERE id = ?`,
+      [req.admin.id]
+    );
+
+    if (!rows.length) {
+      return res.status(404).json({ message: 'Admin not found' });
+    }
+
+    res.status(200).json({ admin: rows[0] });
+  } catch (err) {
+    console.error('Admin session error:', err);
+    res.status(500).json({ message: 'Server Error' });
+  }
+};
+
+exports.logout = async (req, res) => {
+  clearAuthCookie(res, 'admin');
+  res.status(200).json({ message: 'Logged out successfully' });
 };
 
 exports.createCategory = async(req,res) => {

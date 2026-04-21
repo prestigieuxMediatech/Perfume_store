@@ -16,9 +16,7 @@ export default function Brands() {
   const [formError, setFormError]   = useState("");
   const [saving, setSaving]         = useState(false);
 
-  const getHeaders = () => ({
-    Authorization: `Bearer ${localStorage.getItem("adminToken")}`
-  });
+  const getHeaders = () => ({});
 
   const generateSlug = (name) =>
     name.toLowerCase().trim()

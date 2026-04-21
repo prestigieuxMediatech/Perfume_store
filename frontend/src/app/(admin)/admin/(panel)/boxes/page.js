@@ -10,9 +10,7 @@ export default function Boxes() {
   const [boxes, setBoxes] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const getHeaders = () => ({
-    Authorization: `Bearer ${localStorage.getItem("adminToken")}`
-  });
+  const getHeaders = () => ({});
 
   const fetchBoxes = async () => {
     setLoading(true);

@@ -55,7 +55,6 @@ export default function Page() {
         { headers: { "Content-Type": "application/json" } }
       );
 
-      localStorage.setItem("adminToken", res.data.Admintoken);
       localStorage.setItem("adminName",res.data.admin.name);
       localStorage.setItem("adminEmail",res.data.admin.email);
       router.push("/admin/dashboard");

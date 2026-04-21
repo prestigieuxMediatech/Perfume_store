@@ -93,7 +93,13 @@ exports.placeOrder = async (req, res) => {
     return res.status(400).json({ message: 'Invalid order data', errors });
   }
 
-  const payment_method = payload.payment_method || 'COD';
+  const payment_method = String(payload.payment_method || 'COD').trim().toUpperCase();
+  if (payment_method !== 'COD') {
+    return res.status(400).json({
+      message: 'Only COD orders are supported right now.',
+      code: 'PAYMENT_METHOD_NOT_SUPPORTED',
+    });
+  }
 
   const connection = await pool.getConnection();
   try {
@@ -161,9 +167,9 @@ exports.placeOrder = async (req, res) => {
       totals.tax_total,
       totals.grand_total,
       'pending',
-      payment_method === 'COD' ? 'unpaid' : 'paid',
-      payment_method
-    ]);
+        'unpaid',
+        payment_method
+      ]);
 
     for (const item of totals.productLines) {
       await connection.query(`

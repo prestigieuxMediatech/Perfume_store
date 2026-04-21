@@ -6,10 +6,6 @@ import { useAuth } from "./AuthContext";
 const CartContext = createContext(null);
 const BASE = process.env.NEXT_PUBLIC_API_URL;
 
-const getAuthHeaders = () => ({
-  Authorization: `Bearer ${localStorage.getItem("token")}`,
-});
-
 export function CartProvider({ children }) {
   const { user } = useAuth();
   const [items, setItems] = useState([]);
@@ -24,9 +20,7 @@ export function CartProvider({ children }) {
     setLoading(true);
     setError("");
     try {
-      const res = await axios.get(`${BASE}/api/auth/cart`, {
-        headers: getAuthHeaders(),
-      });
+      const res = await axios.get(`${BASE}/api/auth/cart`);
       setItems(Array.isArray(res.data) ? res.data : []);
     } catch (err) {
       setError(err.response?.data?.message || "Failed to load cart");
@@ -45,8 +39,7 @@ export function CartProvider({ children }) {
     try {
       await axios.post(
         `${BASE}/api/auth/cart`,
-        { product_id, variant_id, quantity },
-        { headers: getAuthHeaders() }
+        { product_id, variant_id, quantity }
       );
       await refresh();
       return { ok: true };
@@ -63,8 +56,7 @@ export function CartProvider({ children }) {
     try {
       await axios.post(
         `${BASE}/api/auth/cart/box`,
-        { box_id, selections, quantity },
-        { headers: getAuthHeaders() }
+        { box_id, selections, quantity }
       );
       await refresh();
       return { ok: true };
@@ -81,8 +73,7 @@ export function CartProvider({ children }) {
     try {
       await axios.put(
         `${BASE}/api/auth/cart/${id}`,
-        { quantity },
-        { headers: getAuthHeaders() }
+        { quantity }
       );
       await refresh();
       return { ok: true };
@@ -97,9 +88,7 @@ export function CartProvider({ children }) {
   const removeItem = async (id) => {
     if (!user) return { ok: false, reason: "auth" };
     try {
-      await axios.delete(`${BASE}/api/auth/cart/${id}`, {
-        headers: getAuthHeaders(),
-      });
+      await axios.delete(`${BASE}/api/auth/cart/${id}`);
       await refresh();
       return { ok: true };
     } catch (err) {
@@ -113,9 +102,7 @@ export function CartProvider({ children }) {
   const clearCart = async () => {
     if (!user) return { ok: false, reason: "auth" };
     try {
-      await axios.delete(`${BASE}/api/auth/cart`, {
-        headers: getAuthHeaders(),
-      });
+      await axios.delete(`${BASE}/api/auth/cart`);
       await refresh();
       return { ok: true };
     } catch (err) {

@@ -22,7 +22,9 @@ app.use(express.json());
 app.use(passport.initialize());
 
 app.use('/uploads', (req, res, next) => {
-  res.setHeader('Access-Control-Allow-Origin', '*');
+  if (process.env.FRONTEND_URL) {
+    res.setHeader('Access-Control-Allow-Origin', process.env.FRONTEND_URL);
+  }
   res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
   next();
 });

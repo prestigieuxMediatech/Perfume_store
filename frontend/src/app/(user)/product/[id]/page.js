@@ -67,18 +67,21 @@ export default function ProductDetailsPage() {
   }, [id]);
 
   useEffect(() => {
+    if (!user) {
+      setWishlistIds([]);
+      return;
+    }
+
     const fetchWishlist = async () => {
       try {
-        const res = await axios.get(`${BASE}/api/auth/wishlist/ids`, {
-          headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
-        });
+        const res = await axios.get(`${BASE}/api/auth/wishlist/ids`);
         setWishlistIds(res.data || []);
       } catch {
         setWishlistIds([]);
       }
     };
     fetchWishlist();
-  }, []);
+  }, [user]);
 
   const images = useMemo(() => {
     if (!product) return [];
@@ -144,8 +147,7 @@ export default function ProductDetailsPage() {
   };
 
   const toggleWishlist = async () => {
-    const token = localStorage.getItem('token');
-    if (!token) {
+    if (!user) {
       setAuthModalOpen(true);
       return;
     }
@@ -155,15 +157,9 @@ export default function ProductDetailsPage() {
 
     try {
       if (isSaved) {
-        await axios.delete(`${BASE}/api/auth/shop/wishlist/${product.id}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        await axios.delete(`${BASE}/api/auth/shop/wishlist/${product.id}`);
       } else {
-        await axios.post(
-          `${BASE}/api/auth/wishlist`,
-          { product_id: product.id },
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
+        await axios.post(`${BASE}/api/auth/wishlist`, { product_id: product.id });
       }
     } catch {
       setWishlistIds((prev) => (isSaved ? [...prev, product.id] : prev.filter((x) => x !== product.id)));

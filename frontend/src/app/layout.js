@@ -1,3 +1,5 @@
+import AxiosSetup from "./AxiosSetup";
+
 export const metadata = {
   title: "7EVEN",
   description: "Where scent becomes artistry.",
@@ -13,6 +15,7 @@ export default function RootLayout({ children }) {
         />
       </head>
       <body style={{ margin: 0, padding: 0 }}>
+        <AxiosSetup />
         {children}
       </body>
     </html>

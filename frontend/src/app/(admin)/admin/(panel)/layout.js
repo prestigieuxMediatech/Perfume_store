@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
+import axios from "axios";
 import {
   LayoutDashboard, Package,
   ShoppingBag, LogOut, Menu, X, Tag, Layers, Gift, FileText
@@ -26,24 +27,43 @@ export default function AdminPanelLayout({ children }) {
   const [mounted, setMounted]     = useState(false);
 
   useEffect(() => {
-    const token = localStorage.getItem("adminToken");
-    const name = localStorage.getItem("adminName");
+    let isActive = true;
 
-    if (name) {
-      setAdmin(name);
-    }
+    axios
+      .get(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/me`)
+      .then((res) => {
+        if (!isActive) return;
 
-    if (!token) {
-      router.push("/admin/login");
-    }
-    setMounted(true);
+        const adminData = res.data?.admin || null;
+        if (!adminData?.id) {
+          router.push("/admin/login");
+          return;
+        }
+
+        setAdmin(adminData);
+        localStorage.setItem("adminName", adminData.name);
+        localStorage.setItem("adminEmail", adminData.email);
+      })
+      .catch(() => {
+        if (isActive) router.push("/admin/login");
+      })
+      .finally(() => {
+        if (isActive) setMounted(true);
+      });
+
+    return () => {
+      isActive = false;
+    };
   }, [router]);
 
-  const handleLogout = () => {
-    localStorage.removeItem("adminToken");
-    localStorage.removeItem("adminName");
-    localStorage.removeItem("adminEmail");
-    router.push("/admin/login");
+  const handleLogout = async () => {
+    try {
+      await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/logout`);
+    } finally {
+      localStorage.removeItem("adminName");
+      localStorage.removeItem("adminEmail");
+      router.push("/admin/login");
+    }
   };
 
   if (!mounted) {
@@ -102,7 +122,7 @@ export default function AdminPanelLayout({ children }) {
         <div className="ad-sb-foot">
           {!collapsed && admin && (
             <div className="ad-admin-info">
-              <div className="ad-admin-name">{admin}</div>
+              <div className="ad-admin-name">{admin.name}</div>
               <div className="ad-admin-role">Administrator</div>
             </div>
           )}

@@ -9,37 +9,31 @@ function AuthCallbackContent() {
   const { login }    = useAuth();
 
   useEffect(() => {
-    const token    = searchParams.get("token");
     const error    = searchParams.get("error");
     const returnTo = localStorage.getItem("returnTo") || "/";
 
-    if (error || !token) {
+    if (error) {
       router.push("/");
       return;
     }
 
-    // ✅ Save token immediately before anything else
-    localStorage.setItem("token", token);
-
     fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/me`, {
-      headers: { Authorization: `Bearer ${token}` }
+      credentials: "include"
     })
       .then(res => res.json())
       .then(data => {
         if (data && data.id) {
-          login(token, data);
+          login(data);
           localStorage.removeItem("returnTo");
           router.push(returnTo);
         } else {
-          localStorage.removeItem("token");
           router.push("/");
         }
       })
       .catch(() => {
-        localStorage.removeItem("token");
         router.push("/");
       });
-  }, []);
+  }, [login, router, searchParams]);
 
   return (
     <div style={{

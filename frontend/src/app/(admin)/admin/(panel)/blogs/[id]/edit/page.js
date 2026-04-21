@@ -37,9 +37,7 @@ export default function EditBlogPage() {
     existing_cover_image: "",
   });
 
-  const getHeaders = () => ({
-    Authorization: `Bearer ${localStorage.getItem("adminToken")}`,
-  });
+  const getHeaders = () => ({});
 
   useEffect(() => {
     const fetchBlog = async () => {

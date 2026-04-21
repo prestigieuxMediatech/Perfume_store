@@ -23,9 +23,7 @@ export default function EditBox() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  const getHeaders = () => ({
-    Authorization: `Bearer ${localStorage.getItem("adminToken")}`
-  });
+  const getHeaders = () => ({});
 
   useEffect(() => {
     const fetchData = async () => {

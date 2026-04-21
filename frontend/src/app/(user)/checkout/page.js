@@ -102,15 +102,14 @@ export default function CheckoutPage() {
 
     setPlacing(true);
     try {
-      const token = localStorage.getItem("token");
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/api/auth/orders`,
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
           },
+          credentials: "include",
           body: JSON.stringify({
             ...form,
             payment_method: paymentMethod,

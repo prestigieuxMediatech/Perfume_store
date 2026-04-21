@@ -2,6 +2,7 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
 const pool = require('../config/db');
+const { clearAuthCookie, setAuthCookie } = require('../utils/authCookies');
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -90,9 +91,9 @@ exports.signup = async (req, res) => {
 
     const user = users[0];
     const token = buildUserToken(user);
+    setAuthCookie(res, token, 'user');
 
     res.status(201).json({
-      token,
       user: mapUserResponse(user),
     });
   } catch (err) {
@@ -141,9 +142,9 @@ exports.login = async (req, res) => {
     }
 
     const token = buildUserToken(user);
+    setAuthCookie(res, token, 'user');
 
     res.status(200).json({
-      token,
       user: mapUserResponse(user),
     });
   } catch (err) {
@@ -165,8 +166,8 @@ const parseSelections = (value) => {
 
 exports.googleCallback = (req,res) => {
     const token = buildUserToken(req.user);
-
-    res.redirect(`${process.env.FRONTEND_URL}/auth/callback?token=${token}`);
+    setAuthCookie(res, token, 'user');
+    res.redirect(`${process.env.FRONTEND_URL}/auth/callback`);
 }
 
 exports.getMe = async(req,res) => {
@@ -183,6 +184,11 @@ exports.getMe = async(req,res) => {
     catch (err) {
         res.status(500).json({ error: 'Server error' });
     }
+}
+
+exports.logout = async (req, res) => {
+  clearAuthCookie(res, 'user');
+  res.status(200).json({ message: 'Logged out successfully' });
 }
 
 exports.addProductReview = async (req, res) => {

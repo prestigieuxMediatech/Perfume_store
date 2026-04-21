@@ -21,9 +21,7 @@ export default function AddBox() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
 
-  const getHeaders = () => ({
-    Authorization: `Bearer ${localStorage.getItem("adminToken")}`
-  });
+  const getHeaders = () => ({});
 
   useEffect(() => {
     axios.get(`${BASE}/api/admin/categories`, { headers: getHeaders() })

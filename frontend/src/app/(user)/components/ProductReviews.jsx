@@ -83,9 +83,6 @@ export default function ProductReviews({
           rating: form.rating,
           title: form.title,
           comment: form.comment,
-        },
-        {
-          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
         }
       );
 

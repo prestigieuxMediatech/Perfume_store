@@ -381,8 +381,8 @@ export default function About() {
 
             <div className="about-reveal delay-3 about-quote">
               <p>
-                "Perfume is the art that makes memory speak —
-                we make it speak in a language only you understand."
+                &quot;Perfume is the art that makes memory speak —
+                we make it speak in a language only you understand.&quot;
               </p>
               <cite>— Henri Marceau, Founder</cite>
             </div>

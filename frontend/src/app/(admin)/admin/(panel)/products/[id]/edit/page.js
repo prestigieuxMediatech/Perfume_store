@@ -99,9 +99,7 @@ export default function EditProduct() {
 
   const fileInputRef = useRef(null);
 
-  const getHeaders = () => ({
-    Authorization: `Bearer ${localStorage.getItem("adminToken")}`
-  });
+  const getHeaders = () => ({});
 
   // ── Fetch product + categories ─────────────────────────
   useEffect(() => {

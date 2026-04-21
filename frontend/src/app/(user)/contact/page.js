@@ -12,7 +12,7 @@ const INFO = [
   { icon:'◉', label:'Hours',   val:'Mon–Sat  10:00 – 19:00\nSunday by appointment', href:null,         type:'text' },
 ];
 
-export default function page() {
+export default function Page() {
   const [form, setForm]       = useState({ name:'', email:'', phone:'', message:'' });
   const [active, setActive]   = useState(null);
   const [sending, setSending] = useState(false);

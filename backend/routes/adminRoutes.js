@@ -3,6 +3,8 @@ const router  = express.Router();
 const upload    = require('../config/multer');
 const {
   login,
+  getAdminMe,
+  logout,
   createCategory,
   getCategories,
   updateCategory,
@@ -35,6 +37,8 @@ const { getAdminOrders, getAdminOrderById, updateOrderStatus, deleteAdminOrder }
 const adminAuth = require('../middleware/adminAuth');
 
 router.post('/login', login);
+router.post('/logout', logout);
+router.get('/me', adminAuth, getAdminMe);
 
 router.get('/categories',        adminAuth, getCategories);
 router.post('/create-category',  adminAuth, createCategory);

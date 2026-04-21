@@ -419,7 +419,6 @@ export default function Reviews() {
 
   /* Auto-advance + progress bar */
   useEffect(() => {
-    setProgress(0);
     startRef.current = performance.now();
 
     const tick = (now) => {
@@ -429,6 +428,7 @@ export default function Reviews() {
       if (elapsed < INTERVAL) {
         progressRef.current = requestAnimationFrame(tick);
       } else {
+        setProgress(0);
         setIndex((prev) => (prev + 1) % totalSlides);
       }
     };
@@ -493,7 +493,7 @@ export default function Reviews() {
                 <article key={i} className="review-card">
                   <div className="review-card-shimmer" />
 
-                  <div className="review-quote">"</div>
+                  <div className="review-quote">&quot;</div>
 
                   <p className="review-text">{review.text}</p>
 
@@ -547,4 +547,3 @@ export default function Reviews() {
     </>
   );
 }
-

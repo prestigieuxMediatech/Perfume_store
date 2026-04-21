@@ -81,9 +81,7 @@ export default function AddProduct() {
 
   const fileInputRef = useRef(null);
 
-  const getHeaders = () => ({
-    Authorization: `Bearer ${localStorage.getItem("adminToken")}`
-  });
+  const getHeaders = () => ({});
 
   useEffect(() => {
     axios.get(`${BASE}/api/admin/brands`, { headers: getHeaders() })

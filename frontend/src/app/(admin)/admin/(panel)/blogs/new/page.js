@@ -34,9 +34,7 @@ export default function AddBlogPage() {
     is_published: true,
   });
 
-  const getHeaders = () => ({
-    Authorization: `Bearer ${localStorage.getItem("adminToken")}`,
-  });
+  const getHeaders = () => ({});
 
   const handleChange = (e) => {
     const { name, value } = e.target;

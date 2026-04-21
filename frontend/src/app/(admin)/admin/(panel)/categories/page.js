@@ -17,9 +17,7 @@ export default function Categories() {
   const [saving, setSaving]         = useState(false);
 
   // ── Helpers ────────────────────────────────────────────
-  const getHeaders = () => ({
-    Authorization: `Bearer ${localStorage.getItem("adminToken")}`
-  });
+  const getHeaders = () => ({});
 
   const generateSlug = (name) =>
     name.toLowerCase().trim()

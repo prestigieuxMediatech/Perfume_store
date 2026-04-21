@@ -35,9 +35,7 @@ export default function WishlistPage() {
     if (user) fetchWishlist();
   }, [user]);
 
-  const getHeaders = () => ({
-    Authorization: `Bearer ${localStorage.getItem("token")}`
-  });
+  const getHeaders = () => ({});
 
   const fetchWishlist = async () => {
     setLoading(true);
@@ -129,7 +127,7 @@ export default function WishlistPage() {
             Your<em>Wishlist</em>
           </h1>
           <p className="wl-sub">
-            A curated selection of fragrances you've chosen to remember.
+            A curated selection of fragrances you&apos;ve chosen to remember.
           </p>
           {!loading && (
             <p className="wl-count">

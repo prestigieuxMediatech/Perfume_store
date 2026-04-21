@@ -19,9 +19,7 @@ const getProductImage = (product) => {
 
 /* ── helpers ── */
 const getAuthConfig = () => ({
-  headers: {
-    Authorization: `Bearer ${localStorage.getItem('token')}`
-  }
+  withCredentials: true
 });
 
 const SORT_OPTS = [
@@ -195,8 +193,7 @@ export default function ProductListing() {
   const toggleWish = async (id, e) => {
     e.stopPropagation();
 
-    const token = localStorage.getItem('token');
-    if (!token) {
+    if (!user) {
       alert('Please login first');
       return;
     }

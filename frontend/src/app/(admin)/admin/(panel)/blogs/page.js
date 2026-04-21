@@ -12,9 +12,7 @@ export default function BlogsAdminPage() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
 
-  const getHeaders = () => ({
-    Authorization: `Bearer ${localStorage.getItem("adminToken")}`,
-  });
+  const getHeaders = () => ({});
 
   const fetchBlogs = async () => {
     setLoading(true);

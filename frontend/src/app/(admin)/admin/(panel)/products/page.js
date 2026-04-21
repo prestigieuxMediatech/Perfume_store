@@ -11,9 +11,7 @@ export default function Products() {
   const [loading, setLoading]   = useState(true);
   const [search, setSearch]     = useState("");
 
-  const getHeaders = () => ({
-    Authorization: `Bearer ${localStorage.getItem("adminToken")}`
-  });
+  const getHeaders = () => ({});
 
   const fetchProducts = async () => {
     setLoading(true);
