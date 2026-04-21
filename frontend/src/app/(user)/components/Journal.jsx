@@ -1,5 +1,9 @@
 "use client";
-import React from "react";
+
+import React, { useEffect, useState } from "react";
+import Link from "next/link";
+
+const BASE = process.env.NEXT_PUBLIC_API_URL;
 
 const Styles = () => (
   <style>{`
@@ -37,7 +41,7 @@ const Styles = () => (
       font-size: 0.6rem;
       letter-spacing: 0.32em;
       text-transform: uppercase;
-      color: var(--gold, var(--gold));
+      color: var(--gold);
     }
 
     .journal-eyebrow::before {
@@ -45,7 +49,7 @@ const Styles = () => (
       display: block;
       width: 34px;
       height: 1px;
-      background: var(--gold, var(--gold));
+      background: var(--gold);
     }
 
     .journal-heading {
@@ -60,7 +64,7 @@ const Styles = () => (
       font-family: 'Cormorant Garamond', serif;
       font-style: italic;
       font-weight: 300;
-      color: var(--gold-light, var(--gold-light));
+      color: var(--gold-light);
     }
 
     .journal-sub {
@@ -86,8 +90,7 @@ const Styles = () => (
 
     .journal-card {
       position: relative;
-      background: radial-gradient(circle at 0% 0%, rgba(201,168,76,0.18), transparent 60%),
-                  var(--dark2);
+      background: radial-gradient(circle at 0% 0%, rgba(201,168,76,0.18), transparent 60%), var(--dark2);
       border-radius: 18px;
       border: 1px solid var(--border);
       padding: 1.4rem 1.4rem 1.6rem;
@@ -97,6 +100,7 @@ const Styles = () => (
       overflow: hidden;
       cursor: pointer;
       transition: border-color 0.35s ease, transform 0.35s ease, box-shadow 0.35s ease;
+      text-decoration: none;
     }
 
     .journal-card:hover {
@@ -153,8 +157,7 @@ const Styles = () => (
       border-radius: 18px;
       border: 1px solid var(--border);
       padding: 1.8rem 1.6rem 1.9rem;
-      background: radial-gradient(circle at 100% 0%, rgba(201,168,76,0.25), transparent 60%),
-                  var(--dark2);
+      background: radial-gradient(circle at 100% 0%, rgba(201,168,76,0.25), transparent 60%), var(--dark2);
       display: flex;
       flex-direction: column;
       gap: 1rem;
@@ -171,7 +174,7 @@ const Styles = () => (
       font-size: 2rem;
       letter-spacing: 0.22em;
       text-transform: uppercase;
-      color: rgba(var(--text-rgb),0.04);
+      color: rgba(255,255,255,0.04);
       transform: rotate(6deg);
       pointer-events: none;
     }
@@ -291,30 +294,16 @@ const Styles = () => (
   `}</style>
 );
 
-const ARTICLES = [
-  {
-    tag: "Journal",
-    title: "How light, skin & climate change your scent",
-    meta: "Reading time · 4 min",
-  },
-  {
-    tag: "Behind the Bottle",
-    title: "From Mysore to Grasse: sourcing sandalwood with integrity",
-    meta: "Field notes · 6 min",
-  },
-  {
-    tag: "Rituals",
-    title: "Layering fragrance for evenings that linger",
-    meta: "Perfumer’s advice · 3 min",
-  },
-  {
-    tag: "Craft",
-    title: "Why we age our absolutes in French oak",
-    meta: "Inside the atelier · 5 min",
-  },
-];
-
 export default function Journal() {
+  const [articles, setArticles] = useState([]);
+
+  useEffect(() => {
+    fetch(`${BASE}/api/blogs`)
+      .then((res) => res.json())
+      .then((data) => setArticles(Array.isArray(data) ? data.slice(0, 4) : []))
+      .catch(() => setArticles([]));
+  }, []);
+
   return (
     <>
       <Styles />
@@ -328,24 +317,34 @@ export default function Journal() {
               </h2>
             </div>
             <p className="journal-sub">
-              Essays, rituals and field notes from the perfumers behind 7EVEN —
+              Essays, rituals and field notes from the perfumers behind 7EVEN,
               written to help you wear fragrance with intention.
             </p>
           </header>
 
           <div className="journal-grid">
             <div className="journal-articles">
-              {ARTICLES.map((article) => (
-                <article key={article.title} className="journal-card">
-                  <span className="journal-tag">{article.tag}</span>
+              {articles.length > 0 ? articles.map((article) => (
+                <Link key={article.slug} href={`/blog/${article.slug}`} className="journal-card">
+                  <span className="journal-tag">{article.category_label || "Journal"}</span>
                   <h3 className="journal-title">{article.title}</h3>
-                  <span className="journal-meta">{article.meta}</span>
-                  <button className="journal-link" type="button">
+                  <span className="journal-meta">{article.read_time_minutes || 4} min read</span>
+                  <span className="journal-link">
                     <span>Read</span>
                     <span className="journal-link-line" />
-                  </button>
-                </article>
-              ))}
+                  </span>
+                </Link>
+              )) : (
+                <Link href="/blog" className="journal-card" style={{ gridColumn: "1 / -1" }}>
+                  <span className="journal-tag">Maison Journal</span>
+                  <h3 className="journal-title">New editorial stories will appear here soon.</h3>
+                  <span className="journal-meta">Publish the first blog from admin to bring this section live.</span>
+                  <span className="journal-link">
+                    <span>Open Blog</span>
+                    <span className="journal-link-line" />
+                  </span>
+                </Link>
+              )}
             </div>
 
             <aside className="journal-newsletter">
@@ -354,7 +353,7 @@ export default function Journal() {
                 Be the first to know about private releases and atelier evenings.
               </h3>
               <p className="journal-newsletter-copy">
-                We write only when we have something rare to share — usually no
+                We write only when we have something rare to share, usually no
                 more than twice a month.
               </p>
               <form
@@ -374,7 +373,7 @@ export default function Journal() {
                 </button>
               </form>
               <p className="journal-small-print">
-                No promotions, ever — only invitations and stories from the maison.
+                No promotions, ever, only invitations and stories from the maison.
               </p>
             </aside>
           </div>
@@ -383,5 +382,3 @@ export default function Journal() {
     </>
   );
 }
-
-

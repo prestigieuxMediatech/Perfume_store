@@ -10,6 +10,7 @@ import ProductReviews from "../../components/ProductReviews";
 import './product.css';
 
 const BASE = process.env.NEXT_PUBLIC_API_URL;
+const hasItems = (items) => Array.isArray(items) && items.length > 0;
 
 const formatPrice = (value) => {
   if (value === null || value === undefined || value === '') return '-';
@@ -117,6 +118,7 @@ export default function ProductDetailsPage() {
     : (product?.starting_price ? `From ${formatPrice(product.starting_price)}` : '-');
 
   const originalPrice = selectedVariant?.discount_price ? formatPrice(selectedVariant.price) : null;
+  const details = product?.details || {};
 
   const handleAddToCart = async () => {
     setActionMsg('');
@@ -263,9 +265,20 @@ export default function ProductDetailsPage() {
 
             <div className="pd-desc-divider" />
 
+            {details.subtitle && (
+              <p className="pd-subtitle">{details.subtitle}</p>
+            )}
+
             <p className="pd-description">
               {product.description || 'A refined fragrance crafted to linger beautifully, embodying elegance and timeless sophistication.'}
             </p>
+
+            {details.detailed_description && (
+              <div className="pd-story">
+                <div className="pd-story-title">Description</div>
+                <p className="pd-story-copy">{details.detailed_description}</p>
+              </div>
+            )}
 
             {/* Size Selection */}
             {product.variants?.length > 0 && (
@@ -350,6 +363,113 @@ export default function ProductDetailsPage() {
             </div>
           </div>
         </div>
+
+        {(hasItems(details.why_love_it) ||
+          hasItems(details.top_notes) ||
+          hasItems(details.heart_notes) ||
+          hasItems(details.base_notes) ||
+          hasItems(details.performance) ||
+          hasItems(details.who_is_this_for) ||
+          hasItems(details.product_details) ||
+          hasItems(details.shipping_returns) ||
+          details.disclaimer ||
+          details.cta_text) && (
+          <section className="pd-extra">
+            <div className="pd-extra-grid">
+              {hasItems(details.why_love_it) && (
+                <article className="pd-extra-card">
+                  <h2 className="pd-extra-title">Why You&apos;ll Love It</h2>
+                  <ul className="pd-extra-list">
+                    {details.why_love_it.map((item) => (
+                      <li key={item}>{item}</li>
+                    ))}
+                  </ul>
+                </article>
+              )}
+
+              {(hasItems(details.top_notes) || hasItems(details.heart_notes) || hasItems(details.base_notes)) && (
+                <article className="pd-extra-card">
+                  <h2 className="pd-extra-title">Fragrance Notes</h2>
+                  <div className="pd-note-groups">
+                    {hasItems(details.top_notes) && (
+                      <div>
+                        <h3 className="pd-note-label">Top Notes</h3>
+                        <p className="pd-note-copy">{details.top_notes.join(', ')}</p>
+                      </div>
+                    )}
+                    {hasItems(details.heart_notes) && (
+                      <div>
+                        <h3 className="pd-note-label">Heart Notes</h3>
+                        <p className="pd-note-copy">{details.heart_notes.join(', ')}</p>
+                      </div>
+                    )}
+                    {hasItems(details.base_notes) && (
+                      <div>
+                        <h3 className="pd-note-label">Base Notes</h3>
+                        <p className="pd-note-copy">{details.base_notes.join(', ')}</p>
+                      </div>
+                    )}
+                  </div>
+                </article>
+              )}
+
+              {hasItems(details.performance) && (
+                <article className="pd-extra-card">
+                  <h2 className="pd-extra-title">Performance</h2>
+                  <ul className="pd-extra-list">
+                    {details.performance.map((item) => (
+                      <li key={item}>{item}</li>
+                    ))}
+                  </ul>
+                </article>
+              )}
+
+              {hasItems(details.who_is_this_for) && (
+                <article className="pd-extra-card">
+                  <h2 className="pd-extra-title">Who Is This For?</h2>
+                  <ul className="pd-extra-list">
+                    {details.who_is_this_for.map((item) => (
+                      <li key={item}>{item}</li>
+                    ))}
+                  </ul>
+                </article>
+              )}
+
+              {hasItems(details.product_details) && (
+                <article className="pd-extra-card">
+                  <h2 className="pd-extra-title">Product Details</h2>
+                  <ul className="pd-extra-list">
+                    {details.product_details.map((item) => (
+                      <li key={item}>{item}</li>
+                    ))}
+                  </ul>
+                </article>
+              )}
+
+              {hasItems(details.shipping_returns) && (
+                <article className="pd-extra-card">
+                  <h2 className="pd-extra-title">Shipping &amp; Returns</h2>
+                  <ul className="pd-extra-list">
+                    {details.shipping_returns.map((item) => (
+                      <li key={item}>{item}</li>
+                    ))}
+                  </ul>
+                </article>
+              )}
+            </div>
+
+            {(details.disclaimer || details.cta_text) && (
+              <div className="pd-extra-footer">
+                {details.disclaimer && (
+                  <p className="pd-disclaimer">{details.disclaimer}</p>
+                )}
+                {details.cta_text && (
+                  <p className="pd-cta-copy">{details.cta_text}</p>
+                )}
+              </div>
+            )}
+          </section>
+        )}
 
         {/* Related Products */}
         {product.group_products?.length > 1 && (

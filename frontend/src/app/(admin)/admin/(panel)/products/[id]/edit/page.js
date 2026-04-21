@@ -7,11 +7,68 @@ import Link from "next/link";
 
 const BASE         = process.env.NEXT_PUBLIC_API_URL;
 const SIZE_OPTIONS = ["25ml", "50ml", "75ml", "100ml", "150ml", "200ml"];
+const DETAIL_LIST_FIELDS = [
+  ["why_love_it", "Why They'll Love It", "One highlight per line"],
+  ["top_notes", "Top Notes", "One note per line"],
+  ["heart_notes", "Heart Notes", "One note per line"],
+  ["base_notes", "Base Notes", "One note per line"],
+  ["performance", "Performance", "One point per line"],
+  ["who_is_this_for", "Who Is This For?", "One point per line"],
+  ["product_details", "Product Details", "One point per line"],
+  ["shipping_returns", "Shipping & Returns", "One point per line"],
+];
 const slugifyGroup = (value) => value
   .toLowerCase()
   .trim()
   .replace(/[^a-z0-9]+/g, '-')
   .replace(/(^-|-$)/g, '');
+
+const createEmptyDetails = () => ({
+  subtitle: "",
+  why_love_it: "",
+  detailed_description: "",
+  top_notes: "",
+  heart_notes: "",
+  base_notes: "",
+  performance: "",
+  who_is_this_for: "",
+  product_details: "",
+  shipping_returns: "",
+  disclaimer: "",
+  cta_text: "",
+});
+
+const textFromList = (value) => Array.isArray(value) ? value.join("\n") : "";
+
+const deserializeDetails = (value) => ({
+  subtitle: value?.subtitle ?? "",
+  why_love_it: textFromList(value?.why_love_it),
+  detailed_description: value?.detailed_description ?? "",
+  top_notes: textFromList(value?.top_notes),
+  heart_notes: textFromList(value?.heart_notes),
+  base_notes: textFromList(value?.base_notes),
+  performance: textFromList(value?.performance),
+  who_is_this_for: textFromList(value?.who_is_this_for),
+  product_details: textFromList(value?.product_details),
+  shipping_returns: textFromList(value?.shipping_returns),
+  disclaimer: value?.disclaimer ?? "",
+  cta_text: value?.cta_text ?? "",
+});
+
+const serializeDetails = (details) => JSON.stringify({
+  subtitle: details.subtitle.trim(),
+  why_love_it: details.why_love_it.split("\n").map((item) => item.trim()).filter(Boolean),
+  detailed_description: details.detailed_description.trim(),
+  top_notes: details.top_notes.split("\n").map((item) => item.trim()).filter(Boolean),
+  heart_notes: details.heart_notes.split("\n").map((item) => item.trim()).filter(Boolean),
+  base_notes: details.base_notes.split("\n").map((item) => item.trim()).filter(Boolean),
+  performance: details.performance.split("\n").map((item) => item.trim()).filter(Boolean),
+  who_is_this_for: details.who_is_this_for.split("\n").map((item) => item.trim()).filter(Boolean),
+  product_details: details.product_details.split("\n").map((item) => item.trim()).filter(Boolean),
+  shipping_returns: details.shipping_returns.split("\n").map((item) => item.trim()).filter(Boolean),
+  disclaimer: details.disclaimer.trim(),
+  cta_text: details.cta_text.trim(),
+});
 
 export default function EditProduct() {
   const router = useRouter();
@@ -38,6 +95,7 @@ export default function EditProduct() {
   const [brands, setBrands]         = useState([]);
   const [filteredBrands, setFilteredBrands] = useState([]);
   const [groupTouched, setGroupTouched] = useState(false);
+  const [details, setDetails]       = useState(createEmptyDetails());
 
   const fileInputRef = useRef(null);
 
@@ -61,7 +119,9 @@ export default function EditProduct() {
           group_name:  p.group_name  ?? "",
           description: p.description ?? "",
           category_id: p.category_id ?? "",
+          brand_id:    p.brand_id    ?? "",
         });
+        setDetails(deserializeDetails(p.details));
 
         // Load existing variants
         setVariants(
@@ -97,7 +157,6 @@ export default function EditProduct() {
   useEffect(() => {
     if (form.category_id) {
       setFilteredBrands(brands.filter(b => b.category_id === form.category_id));
-      setForm(prev => ({ ...prev, brand_id: "" })); // reset brand when category changes
     } else {
       setFilteredBrands([]);
     }
@@ -106,6 +165,11 @@ export default function EditProduct() {
   // ── Form change ────────────────────────────────────────
   const handleChange = (e) => {
     const { name, value } = e.target;
+    if (name === "category_id") {
+      setForm({ ...form, category_id: value, brand_id: "" });
+      setErrors({ ...errors, [name]: "" });
+      return;
+    }
     if (name === "name" && !groupTouched) {
       setForm({ ...form, name: value, group_name: value ? slugifyGroup(value) : "" });
     } else {
@@ -118,6 +182,11 @@ export default function EditProduct() {
     setGroupTouched(true);
     setForm({ ...form, group_name: e.target.value });
     setErrors({ ...errors, group_name: "" });
+  };
+
+  const handleDetailsChange = (e) => {
+    const { name, value } = e.target;
+    setDetails((prev) => ({ ...prev, [name]: value }));
   };
 
   // ── Variant handlers ───────────────────────────────────
@@ -190,6 +259,7 @@ export default function EditProduct() {
       formData.append("description", form.description);
       if (form.category_id) formData.append("category_id", form.category_id);
       if (form.brand_id) formData.append("brand_id", form.brand_id);
+      formData.append("details_json", serializeDetails(details));
       formData.append("variants",    JSON.stringify(variants));
       if (removeImageIds.length > 0)
         formData.append("remove_images", JSON.stringify(removeImageIds));
@@ -267,6 +337,62 @@ export default function EditProduct() {
             className="ad-input" name="description"
             value={form.description} onChange={handleChange}
             rows={4} style={{ resize:"vertical", lineHeight:"1.6" }}
+          />
+        </div>
+
+        <div style={{ marginBottom:"1.2rem" }}>
+          <label className="ad-label">Tagline</label>
+          <input
+            className="ad-input" type="text" name="subtitle"
+            placeholder="e.g. Bold. Addictive. Unforgettable."
+            value={details.subtitle} onChange={handleDetailsChange}
+          />
+        </div>
+
+        <div style={{ marginBottom:"1.2rem" }}>
+          <label className="ad-label">Detailed Description</label>
+          <textarea
+            className="ad-input" name="detailed_description"
+            placeholder="Long-form story for the product page"
+            value={details.detailed_description} onChange={handleDetailsChange}
+            rows={5} style={{ resize:"vertical", lineHeight:"1.6" }}
+          />
+        </div>
+
+        {DETAIL_LIST_FIELDS.map(([key, label, helper]) => (
+          <div key={key} style={{ marginBottom:"1.2rem" }}>
+            <label className="ad-label">
+              {label}
+              <span style={{ color:"#4a4540", fontSize:"0.58rem", textTransform:"none", marginLeft:"0.4rem" }}>
+                {helper}
+              </span>
+            </label>
+            <textarea
+              className="ad-input" name={key}
+              placeholder={helper}
+              value={details[key]} onChange={handleDetailsChange}
+              rows={4} style={{ resize:"vertical", lineHeight:"1.6" }}
+            />
+          </div>
+        ))}
+
+        <div style={{ marginBottom:"1.2rem" }}>
+          <label className="ad-label">Disclaimer</label>
+          <textarea
+            className="ad-input" name="disclaimer"
+            placeholder="Inspired product disclaimer"
+            value={details.disclaimer} onChange={handleDetailsChange}
+            rows={3} style={{ resize:"vertical", lineHeight:"1.6" }}
+          />
+        </div>
+
+        <div style={{ marginBottom:"1.8rem" }}>
+          <label className="ad-label">Closing CTA</label>
+          <textarea
+            className="ad-input" name="cta_text"
+            placeholder="Final call to action shown on the product page"
+            value={details.cta_text} onChange={handleDetailsChange}
+            rows={2} style={{ resize:"vertical", lineHeight:"1.6" }}
           />
         </div>
 

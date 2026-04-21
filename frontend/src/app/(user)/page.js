@@ -1,6 +1,7 @@
 import About from "./components/About";
 import Experience from "./components/Experience";
 import Hero from "./components/Hero";
+import Journal from "./components/Journal";
 import Products from "./components/Products";
 import Reviews from "./components/Reviews";
 import React from "react";
@@ -12,6 +13,7 @@ function Home() {
       <About />
       <Products />
       <Experience />
+      <Journal />
       <Reviews />
     </div>
   );

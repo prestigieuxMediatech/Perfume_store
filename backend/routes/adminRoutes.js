@@ -24,6 +24,13 @@ const {
   updateBox,
   deleteBox
 } = require('../controllers/boxController');
+const {
+  getAdminBlogs,
+  getAdminBlogById,
+  createBlog,
+  updateBlog,
+  deleteBlog,
+} = require('../controllers/blogController');
 const { getAdminOrders, getAdminOrderById, updateOrderStatus, deleteAdminOrder } = require('../controllers/orderController');
 const adminAuth = require('../middleware/adminAuth');
 
@@ -48,6 +55,12 @@ router.post('/boxes', adminAuth, addBox);
 router.get('/boxes/:id', adminAuth, getBoxById);
 router.put('/boxes/:id', adminAuth, updateBox);
 router.delete('/boxes/:id', adminAuth, deleteBox);
+
+router.get('/blogs', adminAuth, getAdminBlogs);
+router.post('/blogs', adminAuth, upload.single('cover_image'), createBlog);
+router.get('/blogs/:id', adminAuth, getAdminBlogById);
+router.put('/blogs/:id', adminAuth, upload.single('cover_image'), updateBlog);
+router.delete('/blogs/:id', adminAuth, deleteBlog);
 
 router.get('/orders', adminAuth, getAdminOrders);
 router.get('/orders/:id', adminAuth, getAdminOrderById);

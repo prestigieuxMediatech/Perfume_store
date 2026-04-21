@@ -2,6 +2,10 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const pool = require('../config/db');
 const saveImage = require('../config/saveImage');
+const {
+  parseProductDetails,
+  stringifyProductDetails,
+} = require('../utils/productDetails');
 
 const slugifyGroup = (value) => {
   if (!value) return null;
@@ -291,7 +295,7 @@ exports.deleteBrand = async (req, res) => {
 
 exports.addProduct = async (req, res) => {
   try {
-    const { name, description, category_id, brand_id, variants, group_name } = req.body;
+    const { name, description, category_id, brand_id, variants, group_name, details_json } = req.body;
 
     // Validation
     if (!name) {
@@ -328,10 +332,11 @@ exports.addProduct = async (req, res) => {
     // Insert product
     const productId = require('crypto').randomUUID();
     const finalGroupName = group_name ? group_name.trim() : slugifyGroup(name);
+    const productDetails = stringifyProductDetails(parseProductDetails(details_json));
     await pool.query(
-      `INSERT INTO products (id, name, description, category_id, brand_id, group_name)
-      VALUES (?, ?, ?, ?, ?, ?)`,
-      [productId, name, description || null, category_id || null, brand_id || null, finalGroupName || null]
+      `INSERT INTO products (id, name, description, category_id, brand_id, group_name, details_json)
+      VALUES (?, ?, ?, ?, ?, ?, ?)`,
+      [productId, name, description || null, category_id || null, brand_id || null, finalGroupName || null, productDetails]
     );
 
     // Insert variants
@@ -370,6 +375,7 @@ exports.getProducts = async (req, res) => {
         p.name,
         p.description,
         p.group_name,
+        p.details_json,
         p.is_active,
         p.created_at,
         c.name       AS category_name,
@@ -387,6 +393,7 @@ exports.getProducts = async (req, res) => {
 
     // Get starting price for each product (lowest variant price)
     for (const product of products) {
+      product.details = parseProductDetails(product.details_json);
       const [variants] = await pool.query(
         `SELECT size, price, discount_price
          FROM product_variants
@@ -432,6 +439,7 @@ exports.getProductById = async (req, res) => {
 
     res.status(200).json({
       ...products[0],
+      details: parseProductDetails(products[0].details_json),
       images,
       variants,
     });
@@ -446,7 +454,7 @@ exports.getProductById = async (req, res) => {
 exports.updateProduct = async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, description, category_id, brand_id, variants, remove_images, group_name } = req.body;
+    const { name, description, category_id, brand_id, variants, remove_images, group_name, details_json } = req.body;
 
     if (!name) {
       return res.status(400).json({ message: 'Product name is required' });
@@ -462,11 +470,12 @@ exports.updateProduct = async (req, res) => {
 
     // Update product
     const finalGroupName = group_name ? group_name.trim() : slugifyGroup(name);
+    const productDetails = stringifyProductDetails(parseProductDetails(details_json));
     await pool.query(`
       UPDATE products
-      SET name = ?, description = ?, category_id = ?, brand_id = ?, group_name = ?
+      SET name = ?, description = ?, category_id = ?, brand_id = ?, group_name = ?, details_json = ?
       WHERE id = ?
-    `, [name, description || null, category_id || null, brand_id || null, finalGroupName || null, id]);
+    `, [name, description || null, category_id || null, brand_id || null, finalGroupName || null, productDetails, id]);
 
     // Replace variants — delete old ones and insert new
     if (variants) {

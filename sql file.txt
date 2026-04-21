@@ -36,11 +36,13 @@ CREATE TABLE products (
   	name           VARCHAR(200) NOT NULL,
   	description    TEXT,
   	category_id    VARCHAR(36)  DEFAULT NULL,
-	brand_id VARCHAR(36) DEFAULT NULL,
+	brand_id       VARCHAR(36)  DEFAULT NULL,
+	group_name     VARCHAR(255) DEFAULT NULL,
+	details_json   LONGTEXT     DEFAULT NULL,
   	is_active      BOOLEAN      DEFAULT TRUE,
   	created_at     DATETIME     DEFAULT NOW(),
   	updated_at     DATETIME     DEFAULT NOW() ON UPDATE NOW(),
-  	FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE SET NULL
+  	FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE SET NULL,
 	FOREIGN KEY (brand_id) REFERENCES brands(id) ON DELETE SET NULL
 );
 
@@ -69,6 +71,22 @@ CREATE TABLE brands (
   	category_id VARCHAR(36)  DEFAULT NULL,
   	created_at  DATETIME     DEFAULT NOW(),
   	FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE SET NULL
+);
+
+CREATE TABLE blogs (
+	id                VARCHAR(36) PRIMARY KEY DEFAULT (UUID()),
+	title             VARCHAR(220) NOT NULL,
+	slug              VARCHAR(240) NOT NULL UNIQUE,
+	category_label    VARCHAR(80) DEFAULT 'Journal',
+	excerpt           TEXT NOT NULL,
+	content           LONGTEXT NOT NULL,
+	cover_image       VARCHAR(255) DEFAULT NULL,
+	author_name       VARCHAR(120) DEFAULT '7EVEN Editorial',
+	read_time_minutes INT DEFAULT 4,
+	is_published      BOOLEAN DEFAULT FALSE,
+	published_at      DATETIME DEFAULT NULL,
+	created_at        DATETIME DEFAULT NOW(),
+	updated_at        DATETIME DEFAULT NOW() ON UPDATE NOW()
 );
 
 CREATE TABLE wishlists (

@@ -224,6 +224,43 @@
   margin: 0;
 }
 
+.pd-subtitle {
+  margin: 0;
+  color: var(--gold-light);
+  font-size: 1.05rem;
+  font-style: italic;
+  letter-spacing: 0.02em;
+}
+
+.pd-story {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  padding: 1rem 1.1rem;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.pd-story-title,
+.pd-extra-title,
+.pd-note-label {
+  font-family: 'Cinzel', serif;
+  text-transform: uppercase;
+}
+
+.pd-story-title {
+  font-size: 0.62rem;
+  letter-spacing: 0.18em;
+  color: var(--gold);
+}
+
+.pd-story-copy {
+  margin: 0;
+  line-height: 1.8;
+  color: var(--cream-muted);
+}
+
 /* ── VARIANTS ── */
 .pd-variants {
   display: flex;
@@ -440,6 +477,84 @@
 .pd-details-value {
   color: var(--cream);
   text-align: right;
+}
+
+.pd-extra {
+  margin-top: 4rem;
+  padding-top: 2.5rem;
+  border-top: 1px solid var(--border);
+}
+
+.pd-extra-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.pd-extra-card {
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.02);
+  padding: 1.4rem;
+}
+
+.pd-extra-title {
+  margin: 0 0 1rem;
+  font-size: 0.68rem;
+  letter-spacing: 0.18em;
+  color: var(--gold);
+}
+
+.pd-extra-list {
+  margin: 0;
+  padding-left: 1.1rem;
+  color: var(--cream-muted);
+  display: grid;
+  gap: 0.5rem;
+  line-height: 1.7;
+}
+
+.pd-note-groups {
+  display: grid;
+  gap: 1rem;
+}
+
+.pd-note-label {
+  margin: 0 0 0.4rem;
+  font-size: 0.58rem;
+  letter-spacing: 0.18em;
+  color: var(--cream);
+}
+
+.pd-note-copy {
+  margin: 0;
+  line-height: 1.7;
+  color: var(--cream-muted);
+}
+
+.pd-extra-footer {
+  margin-top: 1rem;
+  display: grid;
+  gap: 0.9rem;
+}
+
+.pd-disclaimer,
+.pd-cta-copy {
+  margin: 0;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 1rem 1.1rem;
+  line-height: 1.75;
+}
+
+.pd-disclaimer {
+  color: var(--cream-muted);
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.pd-cta-copy {
+  color: var(--cream);
+  background: linear-gradient(135deg, rgba(201, 168, 76, 0.12), rgba(255, 255, 255, 0.03));
 }
 
 /* ── RELATED PRODUCTS ── */
@@ -830,6 +945,10 @@
   }
 
   .pd-skeleton-container {
+    grid-template-columns: 1fr;
+  }
+
+  .pd-extra-grid {
     grid-template-columns: 1fr;
   }
 

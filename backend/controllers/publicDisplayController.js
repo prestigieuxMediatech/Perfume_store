@@ -1,4 +1,5 @@
 const pool = require('../config/db');
+const { parseProductDetails } = require('../utils/productDetails');
 
 const getProductReviewsData = async (productId) => {
   const [reviews] = await pool.query(
@@ -71,6 +72,7 @@ exports.getPublicProducts = async (req, res) => {
         p.name,
         p.description,
         p.group_name,
+        p.details_json,
         p.is_active,
         c.name       AS category_name,
         c.slug       AS category_slug,
@@ -106,6 +108,7 @@ exports.getPublicProducts = async (req, res) => {
 
     // Attach variants to each product
     for (const product of products) {
+      product.details = parseProductDetails(product.details_json);
       const [variants] = await pool.query(
         `SELECT id, size, price, discount_price
          FROM product_variants
@@ -188,6 +191,7 @@ exports.getPublicProductById = async (req, res) => {
 
     res.status(200).json({
       ...products[0],
+      details: parseProductDetails(products[0].details_json),
       images,
       variants,
       group_products: groupProducts,

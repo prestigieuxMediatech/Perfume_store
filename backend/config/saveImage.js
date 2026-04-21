@@ -3,9 +3,17 @@ const path   = require('path');
 const fs     = require('fs');
 const { v4: uuidv4 } = require('uuid');
 
-const saveImage = async (fileBuffer) => {
+const saveImage = async (fileBuffer, options = {}) => {
+  const {
+    folder = 'products',
+    width = 800,
+    height = 800,
+    fit = 'inside',
+    quality = 80,
+  } = options;
+
   const filename  = `${uuidv4()}-${Date.now()}.jpg`;
-  const uploadDir = path.join(process.cwd(), 'uploads', 'products');
+  const uploadDir = path.join(process.cwd(), 'uploads', folder);
   const filepath  = path.join(uploadDir, filename);
 
   if (!fs.existsSync(uploadDir)) {
@@ -13,11 +21,11 @@ const saveImage = async (fileBuffer) => {
   }
 
   await sharp(fileBuffer)
-    .resize(800, 800, { fit: 'inside', withoutEnlargement: true })
-    .jpeg({ quality: 80 })
+    .resize(width, height, { fit, withoutEnlargement: true })
+    .jpeg({ quality })
     .toFile(filepath);
 
-  return `/uploads/products/${filename}`;
+  return `/uploads/${folder}/${filename}`;
 };
 
 module.exports = saveImage;

@@ -70,6 +70,7 @@ export default function SiteHeader() {
             <li><Link href="/"        className={isActive("/")}>Home</Link></li>
             <li><Link href="/about"   className={isActive("/about")}>About</Link></li>
             <li><Link href="/shop"    className={isActive("/shop")}>Shop</Link></li>
+            <li><Link href="/blog"    className={isActive("/blog")}>Blog</Link></li>
             <li><Link href="/build-your-box" className={isActive("/build-your-box")}>Build Your Box</Link></li>
             <li><Link href="/contact" className={isActive("/contact")}>Contact</Link></li>
           </ul>
@@ -169,6 +170,7 @@ export default function SiteHeader() {
         <Link href="/"        className={isActive("/")}        onClick={() => setMenuOpen(false)}>Home</Link>
         <Link href="/about"   className={isActive("/about")}   onClick={() => setMenuOpen(false)}>About</Link>
         <Link href="/shop"    className={isActive("/shop")}    onClick={() => setMenuOpen(false)}>Shop</Link>
+        <Link href="/blog"    className={isActive("/blog")}    onClick={() => setMenuOpen(false)}>Blog</Link>
         <Link href="/build-your-box" className={isActive("/build-your-box")} onClick={() => setMenuOpen(false)}>Build Your Box</Link>
         <Link href="/contact" className={isActive("/contact")} onClick={() => setMenuOpen(false)}>Contact</Link>
         <button

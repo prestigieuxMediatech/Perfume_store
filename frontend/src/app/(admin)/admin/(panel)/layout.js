@@ -4,7 +4,7 @@ import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 import {
   LayoutDashboard, Package,
-  ShoppingBag, LogOut, Menu, X, Tag, Layers, Gift
+  ShoppingBag, LogOut, Menu, X, Tag, Layers, Gift, FileText
 } from "lucide-react";
 import "./admin.css";
 
@@ -14,6 +14,7 @@ const navItems = [
   { label: "Brands",     href: "/admin/brands",     icon: Layers          },
   { label: "Products",  href: "/admin/products",  icon: Package          },
   { label: "Boxes",     href: "/admin/boxes",     icon: Gift             },
+  { label: "Blogs",     href: "/admin/blogs",     icon: FileText         },
   { label: "Orders",    href: "/admin/orders",    icon: ShoppingBag      },
 ];
 
@@ -22,24 +23,21 @@ export default function AdminPanelLayout({ children }) {
   const pathname = usePathname();
   const [collapsed, setCollapsed] = useState(false);
   const [admin, setAdmin]         = useState(null);
-  const [checking, setChecking]   = useState(true);
+  const [mounted, setMounted]     = useState(false);
 
   useEffect(() => {
     const token = localStorage.getItem("adminToken");
     const name = localStorage.getItem("adminName");
-    
-    if(name){
-      setAdmin(name)
+
+    if (name) {
+      setAdmin(name);
     }
 
     if (!token) {
       router.push("/admin/login");
-      return;
     }
-    setChecking(false);
-
-    
-  }, []);
+    setMounted(true);
+  }, [router]);
 
   const handleLogout = () => {
     localStorage.removeItem("adminToken");
@@ -48,7 +46,7 @@ export default function AdminPanelLayout({ children }) {
     router.push("/admin/login");
   };
 
-  if (checking) {
+  if (!mounted) {
     return (
       <div style={{
         minHeight:      "100vh",

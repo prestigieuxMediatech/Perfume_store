@@ -1,3 +1,4 @@
+import Link from "next/link";
 import './styles/layout.css'
 
 export default function SiteFooter() {
@@ -22,8 +23,8 @@ export default function SiteFooter() {
             <ul>
               <li><a href="/about">Our Story</a></li>
               <li><a href="/shop">The Collection</a></li>
-              <li><a href="#">Private Atelier</a></li>
-              <li><a href="#">Reviews</a></li>
+              <li><Link href="/blog">Maison Journal</Link></li>
+              <li><a href="/contact">Private Atelier</a></li>
             </ul>
           </div>
 
@@ -44,7 +45,7 @@ export default function SiteFooter() {
             <h3 className="footer-heading">Follow</h3>
             <ul>
               <li><a href="#">Instagram</a></li>
-              <li><a href="#">Journal Letters</a></li>
+              <li><Link href="/blog">Journal Letters</Link></li>
             </ul>
           </div>
 
