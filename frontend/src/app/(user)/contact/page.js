@@ -39,7 +39,7 @@ export default function page() {
 
       <div className="ct-hero">
         <div className="ct-hero-eyebrow">
-          <span/> Maison de Parfum · Est. 1987 <span/>
+          <span/> 7EVEN · Est. 1987 <span/>
         </div>
         <h1 className="ct-hero-heading">
           GET IN

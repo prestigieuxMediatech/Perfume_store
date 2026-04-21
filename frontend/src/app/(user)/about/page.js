@@ -37,7 +37,7 @@ export default function AboutPage() {
           <div className="ah-hero-text">
             <span className="eyebrow ah-eyebrow-anim">
               <span className="eyebrow-line" />
-              Maison de Parfum · Est. 1987
+              7EVEN · Est. 1987
             </span>
             <h1 className="ah-hero-heading">
               OUR

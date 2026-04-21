@@ -426,7 +426,7 @@ export default function Hero() {
 
           {/* ── LEFT ── */}
           <div className="hero-left">
-            <div className="hero-eyebrow">Maison de Parfum — Est. 1987</div>
+            <div className="hero-eyebrow">7EVEN — Est. 1987</div>
 
             <h1 className="hero-heading">
               A Signature of

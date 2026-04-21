@@ -1,5 +1,5 @@
 export const metadata = {
-  title: "Maison de Parfum",
+  title: "7EVEN",
   description: "Where scent becomes artistry.",
 };
 

@@ -1,9 +1,9 @@
 "use client";
-import { useEffect } from "react";
+import { Suspense, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "../../context/AuthContext";
 
-export default function AuthCallback() {
+function AuthCallbackContent() {
   const router       = useRouter();
   const searchParams = useSearchParams();
   const { login }    = useAuth();
@@ -70,5 +70,13 @@ export default function AuthCallback() {
       </p>
       <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
     </div>
+  );
+}
+
+export default function AuthCallback() {
+  return (
+    <Suspense fallback={null}>
+      <AuthCallbackContent />
+    </Suspense>
   );
 }
