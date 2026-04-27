@@ -2,8 +2,8 @@ import LegalPage from "../components/LegalPage";
 import { legalContact, refundContent } from "../legalContent";
 
 export const metadata = {
-  title: "Return & Refund Policy | 7EVEN",
-  description: "Return and refund policy for 7EVEN orders.",
+  title: "Return & Refund Policy |SEVENEVEN",
+  description: "Return and refund policy forSEVENEVEN orders.",
 };
 
 export default function ReturnRefundPolicyPage() {

@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useMemo, useRef, useState } from "react";
+import Image from "next/image";
 import { X } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import "./styles/AuthModal.css"
@@ -74,7 +75,24 @@ export default function AuthModal({ onClose }) {
           <X size={16} strokeWidth={1.5} />
         </button>
 
-        <div className="auth-logo">7EVEN</div>
+        <div className="auth-logo">
+          <Image
+            src="/brand/seveneven-logo-mark.png"
+            alt="Seveneven brand mark"
+            width={72}
+            height={72}
+            className="auth-logo-mark"
+            priority
+          />
+          <Image
+            src="/brand/seveneven-logo-wordmark.png"
+            alt="Seveneven"
+            width={190}
+            height={18}
+            className="auth-logo-wordmark"
+            priority
+          />
+        </div>
         <div className="auth-tagline">Luxury Perfumes</div>
         <div className="auth-divider-line" />
 

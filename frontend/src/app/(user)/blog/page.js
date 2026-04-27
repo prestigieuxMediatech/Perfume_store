@@ -31,8 +31,8 @@ export default function BlogPage() {
     <section className="blog-page">
       <div className="blog-shell">
         <header className="blog-hero">
-          <div className="blog-eyebrow">Maison Journal</div>
-          <h1 className="blog-title">Stories, rituals and quiet notes from 7EVEN.</h1>
+          <div className="blog-eyebrow">SEVENEVEN Journal</div>
+          <h1 className="blog-title">Stories, rituals and quiet notes fromSEVENEVEN.</h1>
           <p className="blog-sub">
             The editorial side of the house: fragrance rituals, ingredient stories,
             seasonal dressing and the slower details that make scent feel personal.
@@ -78,7 +78,7 @@ export default function BlogPage() {
               <div className="blog-side-label">Editorial Notes</div>
               <h2 className="blog-side-title">The same elegance as the storefront, now in story form.</h2>
               <p className="blog-side-copy">
-                Every article is designed to feel like part of the maison, not a disconnected blog template.
+                Every article is designed to feel like part of the SEVENEVEN, not a disconnected blog template.
               </p>
             </div>
 

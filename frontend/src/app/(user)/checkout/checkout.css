@@ -247,6 +247,21 @@
   font-family: 'Cormorant Garamond', serif;
   font-size: 1.1rem;
 }
+
+.checkout-item-link,
+.checkout-box-selection-link {
+  text-decoration: none;
+  transition: color .25s ease;
+}
+
+.checkout-item-link {
+  color: var(--cream);
+}
+
+.checkout-item-link:hover,
+.checkout-box-selection-link:hover {
+  color: var(--goldL);
+}
 .checkout-item-meta {
   font-family: 'Cinzel', serif;
   font-size: .5rem;
@@ -254,6 +269,19 @@
   text-transform: uppercase;
   color: var(--muted);
   margin-top: .3rem;
+}
+
+.checkout-box-selection-list {
+  display: flex;
+  flex-direction: column;
+  gap: .22rem;
+  margin-top: .65rem;
+}
+
+.checkout-box-selection {
+  font-size: .88rem;
+  color: var(--muted);
+  line-height: 1.45;
 }
 
 .checkout-item-price {
@@ -299,7 +327,7 @@
   letter-spacing: .3em;
   text-transform: uppercase;
   background: var(--gold);
-  color: var(--dark);
+  color: var(--button-text);
   border: none;
   padding: 1rem;
   cursor: pointer;

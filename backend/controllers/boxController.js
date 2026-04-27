@@ -1,4 +1,5 @@
 const pool = require('../config/db');
+const saveImage = require('../config/saveImage');
 
 const parseIds = (value) => {
   if (!value) return [];
@@ -21,6 +22,7 @@ exports.getBoxes = async (req, res) => {
         b.id,
         b.name,
         b.description,
+        b.cover_image,
         b.price,
         b.items_count,
         b.is_active,
@@ -30,7 +32,7 @@ exports.getBoxes = async (req, res) => {
       FROM boxes b
       LEFT JOIN box_allowed_categories bac ON bac.box_id = b.id
       LEFT JOIN categories c ON bac.category_id = c.id
-      GROUP BY b.id, b.name, b.description, b.price, b.items_count, b.is_active, b.created_at
+      GROUP BY b.id, b.name, b.description, b.cover_image, b.price, b.items_count, b.is_active, b.created_at
       ORDER BY b.created_at DESC
     `);
     res.status(200).json(rows);
@@ -43,7 +45,7 @@ exports.getBoxes = async (req, res) => {
 // Admin: POST /api/admin/boxes
 exports.addBox = async (req, res) => {
   try {
-    const { name, description, price, items_count, is_active, category_ids } = req.body;
+    const { name, description, existing_cover_image, price, items_count, is_active, category_ids } = req.body;
     if (!name) return res.status(400).json({ message: 'Box name is required' });
     if (!price || Number(price) <= 0) return res.status(400).json({ message: 'Box price is required' });
     if (!items_count || Number(items_count) <= 0) return res.status(400).json({ message: 'Items per box is required' });
@@ -53,14 +55,26 @@ exports.addBox = async (req, res) => {
       return res.status(400).json({ message: 'Select at least one category' });
     }
 
+    let coverImage = normalize(existing_cover_image) || null;
+    if (req.file) {
+      coverImage = await saveImage(req.file.buffer, {
+        folder: 'boxes',
+        width: 1200,
+        height: 1200,
+        fit: 'cover',
+        quality: 84,
+      });
+    }
+
     const boxId = require('crypto').randomUUID();
     await pool.query(
-      `INSERT INTO boxes (id, name, description, price, items_count, is_active)
-       VALUES (?, ?, ?, ?, ?, ?)`,
+      `INSERT INTO boxes (id, name, description, cover_image, price, items_count, is_active)
+       VALUES (?, ?, ?, ?, ?, ?, ?)`,
       [
         boxId,
         normalize(name),
         normalize(description) || null,
+        coverImage,
         Number(price),
         Number(items_count),
         is_active === 'false' ? false : true
@@ -108,7 +122,7 @@ exports.getBoxById = async (req, res) => {
 exports.updateBox = async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, description, price, items_count, is_active, category_ids } = req.body;
+    const { name, description, existing_cover_image, price, items_count, is_active, category_ids } = req.body;
     if (!name) return res.status(400).json({ message: 'Box name is required' });
     if (!price || Number(price) <= 0) return res.status(400).json({ message: 'Box price is required' });
     if (!items_count || Number(items_count) <= 0) return res.status(400).json({ message: 'Items per box is required' });
@@ -121,13 +135,28 @@ exports.updateBox = async (req, res) => {
       return res.status(400).json({ message: 'Select at least one category' });
     }
 
+    const [boxRows] = await pool.query(`SELECT * FROM boxes WHERE id = ?`, [id]);
+    const currentBox = boxRows[0];
+
+    let coverImage = normalize(existing_cover_image) || currentBox.cover_image || null;
+    if (req.file) {
+      coverImage = await saveImage(req.file.buffer, {
+        folder: 'boxes',
+        width: 1200,
+        height: 1200,
+        fit: 'cover',
+        quality: 84,
+      });
+    }
+
     await pool.query(
       `UPDATE boxes
-       SET name = ?, description = ?, price = ?, items_count = ?, is_active = ?
+       SET name = ?, description = ?, cover_image = ?, price = ?, items_count = ?, is_active = ?
        WHERE id = ?`,
       [
         normalize(name),
         normalize(description) || null,
+        coverImage,
         Number(price),
         Number(items_count),
         is_active === 'false' ? false : true,
@@ -176,6 +205,7 @@ exports.getPublicBoxes = async (req, res) => {
         b.id,
         b.name,
         b.description,
+        b.cover_image,
         b.price,
         b.items_count,
         b.is_active,
@@ -187,7 +217,7 @@ exports.getPublicBoxes = async (req, res) => {
       LEFT JOIN box_allowed_categories bac ON bac.box_id = b.id
       LEFT JOIN categories c ON bac.category_id = c.id
       WHERE b.is_active = TRUE
-      GROUP BY b.id, b.name, b.description, b.price, b.items_count, b.is_active, b.created_at
+      GROUP BY b.id, b.name, b.description, b.cover_image, b.price, b.items_count, b.is_active, b.created_at
       ORDER BY b.created_at DESC
     `);
     res.status(200).json(rows);

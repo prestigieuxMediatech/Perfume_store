@@ -268,7 +268,7 @@ export default function Experience() {
 
         <div className="experience-inner">
           <div className="experience-left">
-            <div className="experience-eyebrow">The Maison Experience</div>
+            <div className="experience-eyebrow">The SEVENEVEN Experience</div>
             <h2 className="experience-heading">
               From <em>first impression</em><br />
               to lasting <em>signature</em>
@@ -321,7 +321,7 @@ export default function Experience() {
             <div className="experience-guest">
               <span className="experience-guest-name">Ananya R.</span>
               <span className="experience-guest-meta">
-                Private client · 7EVEN Bespoke No. 07
+                Private client ·SEVENEVEN Bespoke No. 07
               </span>
             </div>
             <div className="experience-badge">

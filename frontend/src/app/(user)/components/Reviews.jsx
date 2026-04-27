@@ -343,7 +343,7 @@ const Styles = () => (
 const REVIEWS = [
   {
     name: "Ishita M.",
-    detail: "Mumbai · 7EVEN Bespoke No. 03",
+    detail: "Mumbai ·SEVENEVEN Bespoke No. 03",
     rating: 5,
     text: "I have never owned a fragrance that feels this personal. Strangers stop me to ask what I'm wearing — and I almost don't want to tell them.",
   },
@@ -373,7 +373,7 @@ const REVIEWS = [
   },
   {
     name: "Elena V.",
-    detail: "Milan · 7EVEN Discovery Set",
+    detail: "Milan ·SEVENEVEN Discovery Set",
     rating: 5,
     text: "Even the sample vials feel like jewelry. The curation is thoughtful and every scent tells a different story.",
   },
@@ -468,7 +468,7 @@ export default function Reviews() {
               </h2>
             </div>
             <p className="reviews-sub">
-              Words from clients who have invited 7EVEN into their daily
+              Words from clients who have invitedSEVENEVEN into their daily
               rituals, celebrations and quiet moments in between.
             </p>
           </header>
@@ -518,7 +518,7 @@ export default function Reviews() {
           {/* Controls */}
           <div className="reviews-controls">
             <span className="reviews-stat">
-              97% would recommend 7EVEN to a loved one
+              97% would recommendSEVENEVEN to a loved one
             </span>
 
             <div className="reviews-dots-arrows">

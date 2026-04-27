@@ -16,6 +16,7 @@ const {
   addProduct,
   getProducts,
   getProductById,
+  updateProductHomeDisplay,
   updateProduct,
   deleteProduct
 } = require('../controllers/adminAuthController');
@@ -51,13 +52,14 @@ router.delete('/brands/:id', adminAuth, deleteBrand);
 router.get('/products',             adminAuth, getProducts);
 router.post('/products', adminAuth, upload.array('images', 3), addProduct);
 router.get('/products/:id',      adminAuth, getProductById);                         
+router.patch('/products/:id/home-display', adminAuth, updateProductHomeDisplay);
 router.put('/products/:id',      adminAuth, upload.array('images', 3), updateProduct); 
 router.delete('/products/:id', adminAuth, deleteProduct);
 
 router.get('/boxes', adminAuth, getBoxes);
-router.post('/boxes', adminAuth, addBox);
+router.post('/boxes', adminAuth, upload.single('cover_image'), addBox);
 router.get('/boxes/:id', adminAuth, getBoxById);
-router.put('/boxes/:id', adminAuth, updateBox);
+router.put('/boxes/:id', adminAuth, upload.single('cover_image'), updateBox);
 router.delete('/boxes/:id', adminAuth, deleteBox);
 
 router.get('/blogs', adminAuth, getAdminBlogs);

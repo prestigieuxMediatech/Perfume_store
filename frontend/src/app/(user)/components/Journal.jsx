@@ -166,7 +166,7 @@ const Styles = () => (
     }
 
     .journal-newsletter::before {
-      content: 'Maison Notes';
+      content: 'SEVENEVEN Notes';
       position: absolute;
       bottom: -24px;
       left: -40px;
@@ -311,13 +311,13 @@ export default function Journal() {
         <div className="journal-inner">
           <header className="journal-header">
             <div>
-              <div className="journal-eyebrow">Maison Journal</div>
+              <div className="journal-eyebrow">SEVENEVEN Journal</div>
               <h2 className="journal-heading">
                 Stories from the <em>atelier</em>
               </h2>
             </div>
             <p className="journal-sub">
-              Essays, rituals and field notes from the perfumers behind 7EVEN,
+              Essays, rituals and field notes from the perfumers behindSEVENEVEN,
               written to help you wear fragrance with intention.
             </p>
           </header>
@@ -336,7 +336,7 @@ export default function Journal() {
                 </Link>
               )) : (
                 <Link href="/blog" className="journal-card" style={{ gridColumn: "1 / -1" }}>
-                  <span className="journal-tag">Maison Journal</span>
+                  <span className="journal-tag">SEVENEVEN Journal</span>
                   <h3 className="journal-title">New editorial stories will appear here soon.</h3>
                   <span className="journal-meta">Publish the first blog from admin to bring this section live.</span>
                   <span className="journal-link">
@@ -373,7 +373,7 @@ export default function Journal() {
                 </button>
               </form>
               <p className="journal-small-print">
-                No promotions, ever, only invitations and stories from the maison.
+                No promotions, ever, only invitations and stories from the SEVENEVEN.
               </p>
             </aside>
           </div>

@@ -6,7 +6,7 @@ import './contact.css';
 import useReveal from '../hooks/useReveal';
 
 const INFO = [
-  { icon:'◈', label:'Email',   val:'hello@7EVEN-parfum.com',  href:'mailto:hello@7EVEN-parfum.com',  type:'link' },
+  { icon:'◈', label:'Email',   val:'sevenevenam@gmail.com',  href:'mailto:sevenevenam@gmail.com',  type:'link' },
   { icon:'◇', label:'Phone',   val:'+1 (234) 567-890',         href:'tel:+1234567890',                type:'link' },
   { icon:'✦', label:'Atelier', val:'12 Rue du Faubourg,\nGrasse, France',  href:null,                   type:'text' },
   { icon:'◉', label:'Hours',   val:'Mon–Sat  10:00 – 19:00\nSunday by appointment', href:null,         type:'text' },
@@ -39,7 +39,7 @@ export default function Page() {
 
       <div className="ct-hero">
         <div className="ct-hero-eyebrow">
-          <span/> 7EVEN · Est. 1987 <span/>
+          <span/>SEVENEVEN · Est. 1987 <span/>
         </div>
         <h1 className="ct-hero-heading">
           GET IN

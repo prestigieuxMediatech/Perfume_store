@@ -64,7 +64,8 @@ const getProductReviewsData = async (productId) => {
 // GET /api/products — public, no auth needed
 exports.getPublicProducts = async (req, res) => {
   try {
-    const { category, brand, sort } = req.query;
+    const { category, brand, sort, home } = req.query;
+    const onlyHomeProducts = String(home).toLowerCase() === 'true';
 
     let query = `
       SELECT
@@ -74,6 +75,8 @@ exports.getPublicProducts = async (req, res) => {
         p.group_name,
         p.details_json,
         p.is_active,
+        p.show_on_home,
+        p.home_display_order,
         c.name       AS category_name,
         c.slug       AS category_slug,
         b.name       AS brand_name,
@@ -89,6 +92,10 @@ exports.getPublicProducts = async (req, res) => {
 
     const params = [];
 
+    if (onlyHomeProducts) {
+      query += ` AND p.show_on_home = TRUE`;
+    }
+
     if (category) {
       query += ` AND c.slug = ?`;
       params.push(category);
@@ -100,9 +107,21 @@ exports.getPublicProducts = async (req, res) => {
     }
 
     // Sorting
-    if (sort === 'newest')     query += ` ORDER BY p.created_at DESC`;
-    else if (sort === 'a-z')   query += ` ORDER BY p.name ASC`;
-    else                       query += ` ORDER BY p.created_at DESC`;
+    if (onlyHomeProducts) {
+      query += `
+        ORDER BY
+          CASE WHEN p.home_display_order IS NULL THEN 1 ELSE 0 END,
+          p.home_display_order ASC,
+          p.created_at DESC
+        LIMIT 4
+      `;
+    } else if (sort === 'newest') {
+      query += ` ORDER BY p.created_at DESC`;
+    } else if (sort === 'a-z') {
+      query += ` ORDER BY p.name ASC`;
+    } else {
+      query += ` ORDER BY p.created_at DESC`;
+    }
 
     const [products] = await pool.query(query, params);
 

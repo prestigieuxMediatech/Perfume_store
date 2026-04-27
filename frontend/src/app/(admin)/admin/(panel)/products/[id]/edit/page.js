@@ -81,6 +81,8 @@ export default function EditProduct() {
     description: "",
     category_id: "",
     brand_id:    "",
+    show_on_home: false,
+    home_display_order: "",
   });
   const [variants, setVariants]         = useState([]);
   const [existingImages, setExistingImages] = useState([]);
@@ -118,6 +120,8 @@ export default function EditProduct() {
           description: p.description ?? "",
           category_id: p.category_id ?? "",
           brand_id:    p.brand_id    ?? "",
+          show_on_home: Boolean(p.show_on_home),
+          home_display_order: p.home_display_order ?? "",
         });
         setDetails(deserializeDetails(p.details));
 
@@ -162,16 +166,25 @@ export default function EditProduct() {
 
   // ── Form change ────────────────────────────────────────
   const handleChange = (e) => {
-    const { name, value } = e.target;
+    const { name, value, type, checked } = e.target;
+    const nextValue = type === "checkbox" ? checked : value;
     if (name === "category_id") {
       setForm({ ...form, category_id: value, brand_id: "" });
       setErrors({ ...errors, [name]: "" });
       return;
     }
+    if (name === "show_on_home") {
+      setForm((prev) => ({
+        ...prev,
+        show_on_home: checked,
+        home_display_order: checked ? prev.home_display_order : "",
+      }));
+      return;
+    }
     if (name === "name" && !groupTouched) {
       setForm({ ...form, name: value, group_name: value ? slugifyGroup(value) : "" });
     } else {
-      setForm({ ...form, [name]: value });
+      setForm({ ...form, [name]: nextValue });
     }
     setErrors({ ...errors, [name]: "" });
   };
@@ -257,6 +270,10 @@ export default function EditProduct() {
       formData.append("description", form.description);
       if (form.category_id) formData.append("category_id", form.category_id);
       if (form.brand_id) formData.append("brand_id", form.brand_id);
+      formData.append("show_on_home", form.show_on_home ? "true" : "false");
+      if (form.show_on_home && form.home_display_order) {
+        formData.append("home_display_order", form.home_display_order);
+      }
       formData.append("details_json", serializeDetails(details));
       formData.append("variants",    JSON.stringify(variants));
       if (removeImageIds.length > 0)
@@ -408,6 +425,37 @@ export default function EditProduct() {
             ))}
           </select>
         </div>
+
+        {false && (
+        <div style={{ marginBottom:"1.8rem", padding:"1rem", border:"1px solid #2a2418", background:"#0f0d0b" }}>
+          <label className="ad-label" style={{ display:"flex", alignItems:"center", gap:"0.75rem", cursor:"pointer" }}>
+            <input
+              type="checkbox"
+              name="show_on_home"
+              checked={form.show_on_home}
+              onChange={handleChange}
+            />
+            Display on home page
+          </label>
+          <p style={{ color:"#7A7264", fontSize:"0.68rem", marginTop:"0.4rem" }}>
+            Checked products are used in both the hero and collection sections.
+          </p>
+          {form.show_on_home && (
+            <div style={{ marginTop:"1rem" }}>
+              <label className="ad-label">Home Display Order</label>
+              <input
+                className="ad-input"
+                type="number"
+                min="1"
+                name="home_display_order"
+                placeholder="1 = featured, then 2, 3, 4"
+                value={form.home_display_order}
+                onChange={handleChange}
+              />
+            </div>
+          )}
+        </div>
+        )}
         {/* Brand — only shows after category is selected */}
         <div style={{ marginBottom:"1.8rem" }}>
           <label className="ad-label">

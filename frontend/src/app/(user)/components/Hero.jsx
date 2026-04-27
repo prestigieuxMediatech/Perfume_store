@@ -1,40 +1,7 @@
-﻿"use client";
-import React from "react";
-
-const HERO_PRODUCTS = [
-  {
-    id: 1,
-    family: "Floral / Oriental",
-    name: "Velours Noir",
-    notes: "Black rose, oud, amber and dark vanilla",
-    price: "INR 18,500",
-    img: "/one.webp",
-  },
-  {
-    id: 2,
-    family: "Woody / Spiced",
-    name: "Santal Imperial",
-    notes: "Mysore sandalwood, cardamom and leather",
-    price: "INR 22,000",
-    img: "/two.jpg",
-  },
-  {
-    id: 3,
-    family: "Aquatic / Fresh",
-    name: "Brume d'Aube",
-    notes: "Sea salt, iris, white cedar and musk",
-    price: "INR 15,800",
-    img: "/three.jpg",
-  },
-  {
-    id: 4,
-    family: "Gourmand / Warm",
-    name: "Or Epice",
-    notes: "Saffron, tonka bean, honey and vetiver",
-    price: "INR 26,500",
-    img: "/four.webp",
-  },
-];
+"use client";
+import React, { useEffect, useState } from "react";
+import Link from "next/link";
+import { fetchHomeProducts } from "./homeProducts";
 
 const GlobalStyles = () => (
   <style>{`
@@ -58,7 +25,6 @@ const GlobalStyles = () => (
       overflow: hidden;
     }
 
-    /* radial glow backdrop */
     .hero-section::before {
       content: '';
       position: absolute;
@@ -70,7 +36,6 @@ const GlobalStyles = () => (
       z-index: 0;
     }
 
-    /* diagonal rule */
     .hero-section::after {
       content: '';
       position: absolute; inset: 0; z-index: 0; pointer-events: none;
@@ -96,7 +61,6 @@ const GlobalStyles = () => (
       z-index: 1;
     }
 
-    /* ── LEFT ── */
     .hero-left { display: flex; flex-direction: column; gap: 1.5rem; }
 
     .hero-eyebrow {
@@ -152,7 +116,6 @@ const GlobalStyles = () => (
       animation: fadeUp 0.8s ease both .24s;
     }
 
-    /* ── Metrics strip ── */
     .hero-metrics {
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -184,7 +147,6 @@ const GlobalStyles = () => (
       margin-top: 0.4rem;
     }
 
-    /* ── RIGHT ── */
     .hero-right {
       display: flex;
       flex-direction: column;
@@ -192,7 +154,6 @@ const GlobalStyles = () => (
       animation: fadeUp 0.9s ease both .12s;
     }
 
-    /* ── Feature card ── */
     .hero-feature {
       position: relative;
       border-radius: 14px;
@@ -210,7 +171,6 @@ const GlobalStyles = () => (
       box-shadow: 0 24px 60px rgba(0,0,0,0.38);
     }
 
-    /* shimmer sweep on hover */
     .hero-feature::before {
       content: '';
       position: absolute; inset: 0; z-index: 2; pointer-events: none;
@@ -236,7 +196,6 @@ const GlobalStyles = () => (
       filter: brightness(.96) saturate(1);
     }
 
-    /* gold top-edge line */
     .hero-feature-img::after {
       content: '';
       position: absolute; top: 0; left: 0;
@@ -315,10 +274,10 @@ const GlobalStyles = () => (
       padding: .32rem .8rem;
       cursor: pointer;
       transition: border-color .25s, color .25s;
+      text-decoration: none;
     }
     .hero-feature-cta:hover { border-color: var(--border-mid); color: var(--gold); }
 
-    /* ── Thumb strip ── */
     .hero-thumbs {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -333,6 +292,7 @@ const GlobalStyles = () => (
       background: var(--surface);
       cursor: pointer;
       transition: border-color .3s, transform .3s, box-shadow .3s;
+      text-decoration: none;
     }
     .hero-thumb:hover {
       border-color: var(--border-mid);
@@ -388,7 +348,6 @@ const GlobalStyles = () => (
       margin-top: 0.2rem;
     }
 
-    /* ── Responsive ── */
     @media (max-width: 1100px) {
       .hero-section { padding: 6rem 3rem 4rem; }
       .hero-grid { grid-template-columns: 1fr; gap: 3rem; }
@@ -415,18 +374,24 @@ const GlobalStyles = () => (
 );
 
 export default function Hero() {
-  const featured = HERO_PRODUCTS[0];
-  const thumbs   = HERO_PRODUCTS.slice(1, 4);
+  const [products, setProducts] = useState([]);
+
+  useEffect(() => {
+    fetchHomeProducts()
+      .then(setProducts)
+      .catch(() => setProducts([]));
+  }, []);
+
+  const featured = products[0];
+  const thumbs = products.slice(1, 4);
 
   return (
     <>
       <GlobalStyles />
       <section className="hero-section">
         <div className="hero-grid">
-
-          {/* ── LEFT ── */}
           <div className="hero-left">
-            <div className="hero-eyebrow">7EVEN — Est. 1987</div>
+            <div className="hero-eyebrow">7EVEN - Est. 1987</div>
 
             <h1 className="hero-heading">
               A Signature of
@@ -439,8 +404,7 @@ export default function Hero() {
             </p>
 
             <div className="hero-cta">
-              <button className="btn-primary">Explore Collection</button>
-              
+              <Link href="/shop" className="btn-primary">Explore Collection</Link>
             </div>
 
             <div className="hero-metrics">
@@ -454,45 +418,42 @@ export default function Hero() {
               </div>
               <div className="hero-metric">
                 <div className="metric-value">4</div>
-                <div className="metric-label">Signature Families</div>
+                <div className="metric-label">Home Picks</div>
               </div>
             </div>
           </div>
 
-          {/* ── RIGHT ── */}
           <div className="hero-right">
-
-            {/* Featured card — horizontal layout, shorter image */}
-            <div className="hero-feature">
-              <div className="hero-feature-img">
-                <img src={featured.img} alt={featured.name} />
-              </div>
-              <div className="hero-feature-info">
-                <div className="hero-feature-badge">{featured.family}</div>
-                <div className="hero-feature-name">{featured.name}</div>
-                <div className="hero-feature-notes">{featured.notes}</div>
-                <div className="hero-feature-footer">
-                  <div className="hero-feature-price">{featured.price}</div>
-                  <button className="hero-feature-cta">View →</button>
+            {featured ? (
+              <div className="hero-feature">
+                <div className="hero-feature-img">
+                  <img src={featured.img} alt={featured.name} />
+                </div>
+                <div className="hero-feature-info">
+                  <div className="hero-feature-badge">{featured.family}</div>
+                  <div className="hero-feature-name">{featured.name}</div>
+                  <div className="hero-feature-notes">{featured.notes}</div>
+                  <div className="hero-feature-footer">
+                    <div className="hero-feature-price">{featured.price || "View Product"}</div>
+                    <Link href={`/product/${featured.id}`} className="hero-feature-cta">View -&gt;</Link>
+                  </div>
                 </div>
               </div>
-            </div>
+            ) : null}
 
-            {/* Three thumbnails */}
             <div className="hero-thumbs">
-              {thumbs.map(p => (
-                <div className="hero-thumb" key={p.id}>
+              {thumbs.map((product) => (
+                <Link href={`/product/${product.id}`} className="hero-thumb" key={product.id}>
                   <div className="hero-thumb-img">
-                    <img src={p.img} alt={p.name} />
+                    <img src={product.img} alt={product.name} />
                   </div>
                   <div className="hero-thumb-info">
-                    <div className="hero-thumb-name">{p.name}</div>
-                    <div className="hero-thumb-family">{p.family}</div>
+                    <div className="hero-thumb-name">{product.name}</div>
+                    <div className="hero-thumb-family">{product.family}</div>
                   </div>
-                </div>
+                </Link>
               ))}
             </div>
-
           </div>
         </div>
       </section>

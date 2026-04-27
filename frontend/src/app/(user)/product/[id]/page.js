@@ -20,7 +20,7 @@ const formatPrice = (value) => {
 export default function ProductDetailsPage() {
   const { id } = useParams();
   const { user } = useAuth();
-  const { addItem } = useCart();
+  const { addItem, items, removeItem } = useCart();
 
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -115,6 +115,16 @@ export default function ProductDetailsPage() {
 
   const selectedVariant = product?.variants?.find((v) => v.size === selectedSize) ||
     (product?.variants?.length === 1 ? product.variants[0] : null);
+  const cartItemForSelection = useMemo(() => {
+    if (!product || !selectedVariant) return null;
+    return items.find(
+      (item) =>
+        item.item_type === "product" &&
+        Number(item.product_id) === Number(product.id) &&
+        Number(item.variant_id) === Number(selectedVariant.id)
+    ) || null;
+  }, [items, product, selectedVariant]);
+  const isSelectedVariantInCart = !!cartItemForSelection;
 
   const priceDisplay = selectedVariant
     ? formatPrice(selectedVariant.discount_price || selectedVariant.price)
@@ -123,7 +133,7 @@ export default function ProductDetailsPage() {
   const originalPrice = selectedVariant?.discount_price ? formatPrice(selectedVariant.price) : null;
   const details = product?.details || {};
 
-  const handleAddToCart = async () => {
+  const handleCartAction = async () => {
     setActionMsg('');
     if (!user) {
       setAuthModalOpen(true);
@@ -135,13 +145,19 @@ export default function ProductDetailsPage() {
     }
 
     setAdding(true);
-    const res = await addItem({
-      product_id: product.id,
-      variant_id: selectedVariant.id,
-      quantity: 1,
-    });
+    const res = isSelectedVariantInCart
+      ? await removeItem(cartItemForSelection.id)
+      : await addItem({
+          product_id: product.id,
+          variant_id: selectedVariant.id,
+          quantity: 1,
+        });
     setAdding(false);
-    setActionMsg(res.ok ? 'Added to cart' : (res.message || 'Could not add to cart'));
+    setActionMsg(
+      res.ok
+        ? (isSelectedVariantInCart ? 'Removed from cart' : 'Added to cart')
+        : (res.message || `Could not ${isSelectedVariantInCart ? 'remove from cart' : 'add to cart'}`)
+    );
     
     setTimeout(() => setActionMsg(''), 3000);
   };
@@ -321,10 +337,14 @@ export default function ProductDetailsPage() {
             <div className="pd-actions">
               <button 
                 className="pd-add-btn" 
-                onClick={handleAddToCart} 
+                onClick={handleCartAction} 
                 disabled={adding}
               >
-                <span className="pd-btn-text">{adding ? 'Adding...' : 'Add to Bag'}</span>
+                <span className="pd-btn-text">
+                  {adding
+                    ? (isSelectedVariantInCart ? 'Removing...' : 'Adding...')
+                    : (isSelectedVariantInCart ? 'Remove from Cart' : 'Add to Bag')}
+                </span>
                 <span className="pd-btn-icon">→</span>
               </button>
               

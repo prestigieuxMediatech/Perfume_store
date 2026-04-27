@@ -1,6 +1,5 @@
 'use client';
 import { useState, useEffect } from 'react';
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import axios from 'axios';
 import { useAuth } from "../context/AuthContext";
@@ -42,6 +41,18 @@ function HeartIcon({ filled }) {
   );
 }
 
+function HeartButton({ active, onClick }) {
+  return (
+    <button
+      className={`pl-overlay-wish${active ? ' active' : ''}`}
+      onClick={onClick}
+      aria-label={active ? 'Remove from wishlist' : 'Add to wishlist'}
+    >
+      <HeartIcon filled={active} />
+    </button>
+  );
+}
+
 /* ══════════════════════════════════════════
    MAIN COMPONENT
 ══════════════════════════════════════════ */
@@ -62,6 +73,7 @@ export default function ProductListing() {
   const [sort, setSort] = useState('featured');
   const [maxPrice, setMaxPrice] = useState(500000);
   const [checkedSizes, setCheckedSizes] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
 
   const [view, setView] = useState('grid');
   const [wishlist, setWishlist] = useState([]);
@@ -90,7 +102,15 @@ export default function ProductListing() {
   }, [cat, activeBrand, sort]);
 
   useEffect(() => {
+    setVisible(8);
+  }, [searchQuery, maxPrice, checkedSizes]);
+
+  useEffect(() => {
     const fetchWishlist = async () => {
+      if (!user) {
+        setWishlist([]);
+        return;
+      }
       try {
         const res = await axios.get(`${BASE}/api/auth/wishlist/ids`, getAuthConfig());
         setWishlist(res.data || []);
@@ -100,7 +120,7 @@ export default function ProductListing() {
     };
 
     fetchWishlist();
-  }, []);
+  }, [user]);
 
   const fetchProducts = async () => {
     setLoading(true);
@@ -172,6 +192,23 @@ export default function ProductListing() {
   };
 
   const filtered = products
+    .filter((p) => {
+      const query = searchQuery.trim().toLowerCase();
+      if (!query) return true;
+
+      const haystack = [
+        p.name,
+        p.description,
+        p.brand_name,
+        p.category_name,
+        ...(p.variants?.map((v) => v.size) ?? []),
+      ]
+        .filter(Boolean)
+        .join(' ')
+        .toLowerCase();
+
+      return haystack.includes(query);
+    })
     .filter(p => {
       if (!p.starting_price) return true;
       return Number(p.starting_price) <= maxPrice;
@@ -229,6 +266,7 @@ export default function ProductListing() {
     setActiveBrand('all');
     setMaxPrice(500000);
     setCheckedSizes([]);
+    setSearchQuery('');
     setFilteredBrands(brands);
   };
 
@@ -254,7 +292,7 @@ export default function ProductListing() {
             </h1>
             <p className="pl-hero-sub">
               Each scent a chapter. Each bottle a world. Discover the compositions
-              that have defined 7EVEN for thirty-seven years.
+              that have definedSEVENEVEN for thirty-seven years.
             </p>
             <p className="pl-result-count">{filtered.length} Fragrances</p>
           </div>
@@ -282,6 +320,15 @@ export default function ProductListing() {
             </div>
 
             <div className="pl-controls">
+              <label className="pl-search" aria-label="Search fragrances">
+                <input
+                  type="search"
+                  className="pl-search-input"
+                  value={searchQuery}
+                  onChange={e => setSearchQuery(e.target.value)}
+                  placeholder="Search fragrances, brands, sizes..."
+                />
+              </label>
               <select
                 className="pl-sort"
                 value={sort}
@@ -354,7 +401,7 @@ export default function ProductListing() {
               </div>
             )}
 
-            {(cat !== 'all' || activeBrand !== 'all' || checkedSizes.length > 0 || maxPrice < maxProductPrice) && (
+            {(searchQuery.trim() || cat !== 'all' || activeBrand !== 'all' || checkedSizes.length > 0 || maxPrice < maxProductPrice) && (
               <button className="pl-clear-btn" onClick={clearFilters}>
                 ✕ Clear all filters
               </button>
@@ -382,7 +429,11 @@ export default function ProductListing() {
               <div className="pl-empty">
                 <div className="pl-empty-icon">◈</div>
                 <p className="pl-empty-title">No fragrances match your selection</p>
-                <p className="pl-empty-sub">Try adjusting the filters above</p>
+                <p className="pl-empty-sub">
+                  {searchQuery.trim()
+                    ? `Try a different search for "${searchQuery.trim()}"`
+                    : 'Try adjusting the filters above'}
+                </p>
                 <button className="pl-clear-btn" onClick={clearFilters} style={{ color:'var(--gold)' }}>
                   Clear all filters →
                 </button>
@@ -398,14 +449,6 @@ export default function ProductListing() {
                   onKeyDown={(e) => { if (e.key === 'Enter') router.push(`/product/${p.id}`); }}
                 >
                   <div className="pl-card-img">
-                    <button
-                      className={`pl-wish${wishlist.includes(p.id) ? ' active' : ''}`}
-                      onClick={e => toggleWish(p.id, e)}
-                      aria-label="Add to wishlist"
-                    >
-                      <HeartIcon filled={wishlist.includes(p.id)}/>
-                    </button>
-
                     {getProductImage(p) ? (
                       <img
                         src={getProductImage(p)}
@@ -428,14 +471,10 @@ export default function ProductListing() {
                       >
                         {addingId === p.id ? 'Adding...' : 'Add to Cart'}
                       </button>
-                      <Link
-                        className="pl-quick-view"
-                        href={`/product/${p.id}`}
-                        onClick={e => e.stopPropagation()}
-                        aria-label="View details"
-                      >
-                        View
-                      </Link>
+                      <HeartButton
+                        active={wishlist.includes(p.id)}
+                        onClick={e => toggleWish(p.id, e)}
+                      />
                     </div>
                   </div>
 
@@ -476,6 +515,10 @@ export default function ProductListing() {
                       >
                         {addingId === p.id ? 'Adding...' : 'Add to Cart'}
                       </button>
+                      <HeartButton
+                        active={wishlist.includes(p.id)}
+                        onClick={e => toggleWish(p.id, e)}
+                      />
                     </div>
 
                     {cartFeedback.id === p.id && (

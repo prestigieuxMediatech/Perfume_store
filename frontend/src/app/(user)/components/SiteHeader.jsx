@@ -2,7 +2,8 @@
 
 import { usePathname } from "next/navigation";
 import Link from "next/link";
-import { useState } from "react";
+import Image from "next/image";
+import { useState, useSyncExternalStore } from "react";
 import { Heart, ShoppingCart, User, LogOut, ChevronDown, Moon, Sun } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import { useCart } from "../context/CartContext";
@@ -45,6 +46,11 @@ export default function SiteHeader() {
   const [menuOpen, setMenuOpen]   = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const mounted = useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false
+  );
   const { user, logout }          = useAuth();
   const { count }                 = useCart();
   const { theme, toggleTheme }    = useTheme();
@@ -63,7 +69,24 @@ export default function SiteHeader() {
     <>
       <header className="site-header">
 
-        <Link href="/" className="site-logo">7EVEN</Link>
+        <Link href="/" className="site-logo" aria-label="Seveneven home">
+          <Image
+            src="/brand/seveneven-logo-mark.png"
+            alt="Seveneven brand mark"
+            width={42}
+            height={42}
+            className="site-logo-mark"
+            priority
+          />
+          <Image
+            src="/brand/seveneven-logo-wordmark.png"
+            alt="Seveneven"
+            width={180}
+            height={17}
+            className="site-logo-wordmark"
+            priority
+          />
+        </Link>
 
         <nav>
           <ul className="site-nav">
@@ -148,7 +171,7 @@ export default function SiteHeader() {
             aria-label="Toggle theme"
             onClick={toggleTheme}
           >
-            {theme === "dark" ? (
+            {mounted && theme === "dark" ? (
               <Sun size={16} strokeWidth={1.5} />
             ) : (
               <Moon size={16} strokeWidth={1.5} />
@@ -181,7 +204,7 @@ export default function SiteHeader() {
             setMenuOpen(false);
           }}
         >
-          {theme === "dark" ? (
+          {mounted && theme === "dark" ? (
             <>
               <Sun size={16} strokeWidth={1.5} />
               Light mode

@@ -10,6 +10,7 @@ export default function Products() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading]   = useState(true);
   const [search, setSearch]     = useState("");
+  const [savingHomeId, setSavingHomeId] = useState(null);
 
   const getHeaders = () => ({});
 
@@ -31,6 +32,62 @@ export default function Products() {
       fetchProducts();
     } catch (err) {
       alert(err.response?.data?.message || "Could not delete product");
+    }
+  };
+
+  const handleHomeToggle = async (product, checked) => {
+    setSavingHomeId(product.id);
+    try {
+      await axios.patch(
+        `${BASE}/api/admin/products/${product.id}/home-display`,
+        {
+          show_on_home: checked,
+          home_display_order: checked ? (product.home_display_order || "") : "",
+        },
+        { headers: getHeaders() }
+      );
+      setProducts((prev) =>
+        prev.map((item) =>
+          item.id === product.id
+            ? {
+                ...item,
+                show_on_home: checked,
+                home_display_order: checked ? item.home_display_order : null,
+              }
+            : item
+        )
+      );
+    } catch (err) {
+      alert(err.response?.data?.message || "Could not update home display");
+    } finally {
+      setSavingHomeId(null);
+    }
+  };
+
+  const handleHomeOrderChange = (id, value) => {
+    setProducts((prev) =>
+      prev.map((item) =>
+        item.id === id ? { ...item, home_display_order: value } : item
+      )
+    );
+  };
+
+  const handleHomeOrderSave = async (product) => {
+    setSavingHomeId(product.id);
+    try {
+      await axios.patch(
+        `${BASE}/api/admin/products/${product.id}/home-display`,
+        {
+          show_on_home: true,
+          home_display_order: product.home_display_order || "",
+        },
+        { headers: getHeaders() }
+      );
+      fetchProducts();
+    } catch (err) {
+      alert(err.response?.data?.message || "Could not update home order");
+    } finally {
+      setSavingHomeId(null);
     }
   };
 
@@ -67,6 +124,7 @@ export default function Products() {
             <th>Category</th>
             <th>Starting Price</th>
             <th>Sizes</th>
+            <th>Home</th>
             <th>Status</th>
             <th>Actions</th>
           </tr>
@@ -74,13 +132,13 @@ export default function Products() {
         <tbody>
           {loading ? (
             <tr>
-              <td colSpan={8} style={{ color:"#7A7264", textAlign:"center", padding:"2rem" }}>
+              <td colSpan={9} style={{ color:"#7A7264", textAlign:"center", padding:"2rem" }}>
                 Loading...
               </td>
             </tr>
           ) : filtered.length === 0 ? (
             <tr>
-              <td colSpan={8} style={{ color:"#7A7264", textAlign:"center", padding:"2rem" }}>
+              <td colSpan={9} style={{ color:"#7A7264", textAlign:"center", padding:"2rem" }}>
                 No products found
               </td>
             </tr>
@@ -130,6 +188,40 @@ export default function Products() {
                   ? p.variants.map(v => v.size).join(", ")
                   : "—"
                 }
+              </td>
+              <td>
+                <div style={{ display:"flex", flexDirection:"column", gap:"0.5rem", minWidth:"120px" }}>
+                  <label style={{ display:"flex", alignItems:"center", gap:"0.45rem", color:"#F5F0E8", fontSize:"0.74rem" }}>
+                    <input
+                      type="checkbox"
+                      checked={Boolean(p.show_on_home)}
+                      disabled={savingHomeId === p.id}
+                      onChange={(e) => handleHomeToggle(p, e.target.checked)}
+                    />
+                    Home
+                  </label>
+                  {p.show_on_home ? (
+                    <div style={{ display:"flex", gap:"0.4rem", alignItems:"center" }}>
+                      <input
+                        type="number"
+                        min="1"
+                        value={p.home_display_order ?? ""}
+                        onChange={(e) => handleHomeOrderChange(p.id, e.target.value)}
+                        className="ad-input"
+                        style={{ width:"64px", padding:"0.45rem 0.55rem" }}
+                      />
+                      <button
+                        type="button"
+                        className="ad-btn"
+                        onClick={() => handleHomeOrderSave(p)}
+                        disabled={savingHomeId === p.id}
+                        style={{ padding:"0.45rem 0.7rem" }}
+                      >
+                        Save
+                      </button>
+                    </div>
+                  ) : null}
+                </div>
               </td>
               <td>
                 <span className={`badge ${p.is_active ? "active" : "inactive"}`}>

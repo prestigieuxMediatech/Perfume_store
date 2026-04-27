@@ -9,6 +9,16 @@ import "./cart.css";
 
 const MAX_QTY = 10;
 
+const parseSelections = (value) => {
+  if (!value) return [];
+  try {
+    const parsed = JSON.parse(value);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+};
+
 export default function CartPage() {
   const router = useRouter();
   const { user, loading: authLoading } = useAuth();
@@ -81,7 +91,7 @@ export default function CartPage() {
           )}
         </div>
         <div className="cart-hero-orn">
-          <span>◇</span>
+          <span>*</span>
         </div>
       </section>
 
@@ -95,13 +105,13 @@ export default function CartPage() {
             </div>
           ) : items.length === 0 ? (
             <div className="cart-empty">
-              <div className="cart-empty-icon">◇</div>
+              <div className="cart-empty-icon">*</div>
               <h3 className="cart-empty-title">Your cart is empty</h3>
               <p className="cart-empty-sub">
                 Explore the collection and add your next signature scent.
               </p>
               <Link href="/shop" className="cart-browse-btn">
-                Browse the Collection →
+                Browse the Collection
               </Link>
             </div>
           ) : (
@@ -118,15 +128,65 @@ export default function CartPage() {
                   />
                 ))}
                 {(notice || error) && (
-                  <div className="cart-notice">
-                    {notice || error}
-                  </div>
+                  <div className="cart-notice">{notice || error}</div>
                 )}
               </div>
 
               <aside className="cart-summary">
                 <div className="cart-summary-card">
                   <div className="cart-summary-title">Order Summary</div>
+
+                  <div className="cart-summary-items">
+                    {items.map((item) => {
+                      const selections =
+                        item.item_type === "box"
+                          ? parseSelections(item.selections_json)
+                          : [];
+
+                      return (
+                        <div key={item.id} className="cart-summary-item">
+                          <div className="cart-summary-item-head">
+                            {item.item_type === "box" ? (
+                              <span className="cart-summary-item-name">{item.name}</span>
+                            ) : (
+                              <Link
+                                href={`/product/${item.product_id}`}
+                                className="cart-summary-item-name cart-summary-item-link"
+                              >
+                                {item.quantity} x {item.name}
+                              </Link>
+                            )}
+                            <span className="cart-summary-item-price">
+                              ₹
+                              {(
+                                (Number(item.discount_price || item.price) || 0) *
+                                (Number(item.quantity) || 0)
+                              ).toLocaleString("en-IN")}
+                            </span>
+                          </div>
+
+                          {item.item_type === "box" && selections.length > 0 && (
+                            <div className="cart-summary-selection-list">
+                              {selections.map((selection, index) => (
+                                <Link
+                                  key={`${selection.product_id || selection.variant_id || selection.name || "selection"}-${index}`}
+                                  href={
+                                    selection.product_id
+                                      ? `/product/${selection.product_id}`
+                                      : "/shop"
+                                  }
+                                  className="cart-summary-selection-link"
+                                >
+                                  {`1 x ${selection.name || "Selected item"}${selection.size ? ` (${selection.size})` : ""}`}
+                                </Link>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+
                   <div className="cart-summary-row">
                     <span>Subtotal</span>
                     <span>₹{Number(total).toLocaleString("en-IN")}</span>

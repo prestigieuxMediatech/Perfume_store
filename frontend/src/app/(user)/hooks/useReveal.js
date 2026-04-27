@@ -9,7 +9,7 @@ const DEFAULTS = {
 };
 
 export default function useReveal(options = {}) {
-  const { selector, visibleClass, threshold, root, rootMargin } = {
+  const { selector, visibleClass, threshold, root, rootMargin, watch } = {
     ...DEFAULTS,
     ...options,
   };
@@ -32,5 +32,5 @@ export default function useReveal(options = {}) {
 
     elements.forEach((el) => observer.observe(el));
     return () => observer.disconnect();
-  }, [selector, visibleClass, threshold, root, rootMargin]);
+  }, [selector, visibleClass, threshold, root, rootMargin, watch]);
 }

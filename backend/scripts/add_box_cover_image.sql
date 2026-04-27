@@ -1,0 +1,2 @@
+ALTER TABLE boxes
+ADD COLUMN cover_image VARCHAR(255) DEFAULT NULL AFTER description;

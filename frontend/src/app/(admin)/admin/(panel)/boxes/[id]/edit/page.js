@@ -1,27 +1,32 @@
 "use client";
-import { useEffect, useState } from "react";
+
+import { useEffect, useRef, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import axios from "axios";
 import Link from "next/link";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Upload, X } from "lucide-react";
 
 const BASE = process.env.NEXT_PUBLIC_API_URL;
 
 export default function EditBox() {
   const { id } = useParams();
   const router = useRouter();
+  const fileInputRef = useRef(null);
   const [form, setForm] = useState({
     name: "",
     description: "",
     price: "",
     items_count: "",
     is_active: true,
+    existing_cover_image: "",
   });
   const [categories, setCategories] = useState([]);
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [saving, setSaving] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [image, setImage] = useState(null);
+  const [preview, setPreview] = useState("");
 
   const getHeaders = () => ({});
 
@@ -36,10 +41,12 @@ export default function EditBox() {
         setForm({
           name: box.name ?? "",
           description: box.description ?? "",
+          existing_cover_image: box.cover_image ?? "",
           price: box.price ?? "",
           items_count: box.items_count ?? "",
           is_active: box.is_active !== false,
         });
+        setPreview(box.cover_image ? `${BASE}${box.cover_image}` : "");
         setSelectedCategories((box.categories || []).map(c => c.id));
         setCategories(Array.isArray(catRes.data) ? catRes.data : []);
       } catch (err) {
@@ -57,6 +64,20 @@ export default function EditBox() {
     );
   };
 
+  const handleImageSelect = (event) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    setImage(file);
+    setPreview(URL.createObjectURL(file));
+  };
+
+  const removeImage = () => {
+    setImage(null);
+    setPreview("");
+    setForm((prev) => ({ ...prev, existing_cover_image: "" }));
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
@@ -67,10 +88,22 @@ export default function EditBox() {
 
     setSaving(true);
     try {
+      const formData = new FormData();
+      Object.entries(form).forEach(([key, value]) => {
+        formData.append(key, value);
+      });
+      formData.append("category_ids", JSON.stringify(selectedCategories));
+      if (image) formData.append("cover_image", image);
+
       await axios.put(
         `${BASE}/api/admin/boxes/${id}`,
-        { ...form, category_ids: selectedCategories },
-        { headers: getHeaders() }
+        formData,
+        {
+          headers: {
+            ...getHeaders(),
+            "Content-Type": "multipart/form-data",
+          }
+        }
       );
       router.push("/admin/boxes");
     } catch (err) {
@@ -125,9 +158,43 @@ export default function EditBox() {
           />
         </div>
 
+        <div style={{ marginBottom: "1.8rem" }}>
+          <label className="ad-label">Cover Image</label>
+          <div style={{ display: "flex", gap: "0.9rem", alignItems: "flex-start", flexWrap: "wrap" }}>
+            {preview ? (
+              <div style={{ position: "relative" }}>
+                <img src={preview} alt="Box cover preview" style={{ width: 220, height: 140, objectFit: "cover", borderRadius: "6px", border: "1px solid #2a2418" }} />
+                <button
+                  type="button"
+                  onClick={removeImage}
+                  style={{ position: "absolute", top: 8, right: 8, background: "#E8472A", border: "none", width: 24, height: 24, borderRadius: "999px", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}
+                >
+                  <X size={12} color="#fff" />
+                </button>
+              </div>
+            ) : (
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                style={{ width: 220, height: 140, borderRadius: "6px", border: "1px dashed #8A6F34", background: "#0e0d0b", color: "#7A7264", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "0.5rem", cursor: "pointer" }}
+              >
+                <Upload size={20} strokeWidth={1.5} />
+                Upload Cover
+              </button>
+            )}
+          </div>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/jpeg,image/jpg,image/png,image/webp"
+            style={{ display: "none" }}
+            onChange={handleImageSelect}
+          />
+        </div>
+
         <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"1rem", marginBottom:"1.2rem" }}>
           <div>
-            <label className="ad-label">Price (₹)</label>
+            <label className="ad-label">Price (Rs)</label>
             <input
               className="ad-input" type="number" min="0"
               value={form.price}
@@ -148,7 +215,7 @@ export default function EditBox() {
           <label className="ad-label">
             Allowed Categories
             <span style={{ color:"#4a4540", fontSize:"0.58rem", textTransform:"none", marginLeft:"0.4rem" }}>
-              — customers can pick from these
+              - customers can pick from these
             </span>
           </label>
           <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(140px, 1fr))", gap:"0.6rem" }}>

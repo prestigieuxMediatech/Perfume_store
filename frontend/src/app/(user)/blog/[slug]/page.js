@@ -82,7 +82,7 @@ export default function BlogDetailPage() {
               <aside className="blog-detail-side">
                 <div className="blog-detail-side-card">
                   <div className="blog-detail-side-label">About This Piece</div>
-                  <h2 className="blog-detail-side-title">Written to feel like part of the maison.</h2>
+                  <h2 className="blog-detail-side-title">Written to feel like part of the SEVENEVEN.</h2>
                   <p className="blog-detail-excerpt" style={{ fontSize: "0.98rem", marginTop: "0.7rem" }}>
                     The blog experience uses the same visual language as the storefront so it feels intentional across the whole site.
                   </p>

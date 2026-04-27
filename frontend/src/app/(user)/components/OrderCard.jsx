@@ -1,4 +1,5 @@
 ﻿"use client";
+import Link from "next/link";
 import { useState } from "react";
 
 const formatDate = (value) => {
@@ -49,19 +50,29 @@ export default function OrderCard({ order, onCancel, isCancelling }) {
           {items.map((item) => (
             <div key={item.id} className="orders-item">
               <div className="orders-item-img">
-                {item.item_type !== "box" && item.image ? (
-                  <img
-                    src={`${process.env.NEXT_PUBLIC_API_URL}${item.image}`}
-                    alt={item.product_name}
-                  />
+                {item.item_type !== "box" ? (
+                  <Link href={`/product/${item.product_id}`} className="orders-item-link-cover">
+                    {item.image ? (
+                      <img
+                        src={`${process.env.NEXT_PUBLIC_API_URL}${item.image}`}
+                        alt={item.product_name}
+                      />
+                    ) : (
+                      <div className="orders-no-img">NO IMAGE</div>
+                    )}
+                  </Link>
                 ) : (
-                  <div className="orders-no-img">{item.item_type === "box" ? "BOX" : "NO IMAGE"}</div>
+                  <div className="orders-no-img">BOX</div>
                 )}
               </div>
               <div className="orders-item-body">
-                <div className="orders-item-name">
-                  {item.item_type === "box" ? item.box_name : item.product_name}
-                </div>
+                {item.item_type === "box" ? (
+                  <div className="orders-item-name">{item.box_name}</div>
+                ) : (
+                  <Link href={`/product/${item.product_id}`} className="orders-item-name orders-item-link">
+                    {item.product_name}
+                  </Link>
+                )}
                 <div className="orders-item-meta">
                   {item.item_type === "box"
                     ? `Custom box | Qty ${item.quantity}`

@@ -1,13 +1,20 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 import axios from "axios";
 import { useAuth } from "../context/AuthContext";
 import { useCart } from "../context/CartContext";
 import "./build-box.css";
 
 const BASE = process.env.NEXT_PUBLIC_API_URL;
+const resolveImageUrl = (value) => {
+  if (!value) return "";
+  if (/^https?:\/\//i.test(value)) return value;
+  return `${BASE}${value}`;
+};
 
 export default function BuildYourBoxPage() {
+  const router = useRouter();
   const { user } = useAuth();
   const { addBox } = useCart();
   const [boxes, setBoxes] = useState([]);
@@ -51,7 +58,7 @@ export default function BuildYourBoxPage() {
       }
       try {
         const res = await axios.get(`${BASE}/api/products`, {
-          params: { category: activeCategory }
+          params: { category: activeCategory },
         });
         setProducts(Array.isArray(res.data) ? res.data : []);
       } catch {
@@ -67,6 +74,12 @@ export default function BuildYourBoxPage() {
     () => new Set(selectedItems.map((i) => i.product_id)),
     [selectedItems]
   );
+
+  const getProductImage = (product) => {
+    if (product?.primary_image) return resolveImageUrl(product.primary_image);
+    const imageUrl = product?.images?.[0]?.image_url || product?.images?.[0];
+    return resolveImageUrl(imageUrl);
+  };
 
   const handleSelect = (product) => {
     const existing = selectedItems.find((i) => i.product_id === product.id);
@@ -90,8 +103,9 @@ export default function BuildYourBoxPage() {
         product_id: product.id,
         variant_id: variant.id,
         name: product.name,
-        size: variant.size
-      }
+        size: variant.size,
+        image: getProductImage(product),
+      },
     ]);
   };
 
@@ -111,9 +125,9 @@ export default function BuildYourBoxPage() {
       box_id: selectedBox.id,
       selections: selectedItems.map((item) => ({
         product_id: item.product_id,
-        variant_id: item.variant_id
+        variant_id: item.variant_id,
       })),
-      quantity: 1
+      quantity: 1,
     });
     setAdding(false);
     if (!res.ok) {
@@ -152,6 +166,17 @@ export default function BuildYourBoxPage() {
                   className={`byb-box-card${selectedBox?.id === box.id ? " active" : ""}`}
                   onClick={() => setSelectedBox(box)}
                 >
+                  <div className="byb-box-cover">
+                    {resolveImageUrl(box.cover_image) ? (
+                      <img
+                        src={resolveImageUrl(box.cover_image)}
+                        alt={box.name}
+                        loading="lazy"
+                      />
+                    ) : (
+                      <div className="byb-box-cover-fallback">BOX</div>
+                    )}
+                  </div>
                   <div className="byb-box-name">{box.name}</div>
                   <div className="byb-box-meta">
                     Pick {box.items_count} at {Number(box.price).toLocaleString("en-IN")}
@@ -165,10 +190,23 @@ export default function BuildYourBoxPage() {
           {selectedBox && (
             <div className="byb-builder">
               <div className="byb-builder-head">
-                <div>
-                  <div className="byb-builder-title">{selectedBox.name}</div>
-                  <div className="byb-builder-sub">
-                    Select {maxItems} items from allowed categories.
+                <div className="byb-builder-identity">
+                  <div className="byb-builder-cover">
+                    {resolveImageUrl(selectedBox.cover_image) ? (
+                      <img
+                        src={resolveImageUrl(selectedBox.cover_image)}
+                        alt={selectedBox.name}
+                        loading="lazy"
+                      />
+                    ) : (
+                      <div className="byb-box-cover-fallback">BOX</div>
+                    )}
+                  </div>
+                  <div>
+                    <div className="byb-builder-title">{selectedBox.name}</div>
+                    <div className="byb-builder-sub">
+                      Select {maxItems} items from allowed categories.
+                    </div>
                   </div>
                 </div>
                 <div className="byb-price">
@@ -194,20 +232,60 @@ export default function BuildYourBoxPage() {
 
               <div className="byb-products">
                 {products.map((product) => (
-                  <button
+                  <article
                     key={product.id}
-                    type="button"
                     className={`byb-product${chosenIds.has(product.id) ? " selected" : ""}`}
-                    onClick={() => handleSelect(product)}
+                    role="link"
+                    tabIndex={0}
+                    onClick={() => router.push(`/product/${product.id}`)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") router.push(`/product/${product.id}`);
+                    }}
                   >
-                    <div className="byb-product-name">{product.name}</div>
-                    <div className="byb-product-meta">
-                      {product.brand_name ?? product.category_name ?? "â€”"}
+                    <div className="byb-product-image">
+                      {getProductImage(product) ? (
+                        <img src={getProductImage(product)} alt={product.name} loading="lazy" />
+                      ) : (
+                        <div className="byb-product-fallback">NO IMAGE</div>
+                      )}
                     </div>
-                    <div className="byb-product-size">
-                      Size: {product.variants?.[0]?.size || "â€”"}
+                    <div className="byb-product-body">
+                      <div className="byb-product-name">{product.name}</div>
+                      <div className="byb-product-meta">
+                        {product.brand_name ?? product.category_name ?? "-"}
+                      </div>
+                      <div className="byb-product-size">
+                        Size: {product.variants?.[0]?.size || "-"}
+                      </div>
+                      <div className="byb-product-price">
+                        {product.starting_price
+                          ? `Rs ${Number(product.starting_price).toLocaleString("en-IN")}`
+                          : "-"}
+                      </div>
+                      <div className="byb-product-actions">
+                        <button
+                          type="button"
+                          className={`byb-product-select${chosenIds.has(product.id) ? " selected" : ""}`}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleSelect(product);
+                          }}
+                        >
+                          {chosenIds.has(product.id) ? "Selected" : "Select for Box"}
+                        </button>
+                        <button
+                          type="button"
+                          className="byb-product-view"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            router.push(`/product/${product.id}`);
+                          }}
+                        >
+                          View Details
+                        </button>
+                      </div>
                     </div>
-                  </button>
+                  </article>
                 ))}
               </div>
 

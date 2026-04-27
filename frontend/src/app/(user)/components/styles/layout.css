@@ -68,6 +68,7 @@
 
   /* ── Misc ── */
   --badge-text: #0c0a08;
+  --button-text: #0c0a08;
 }
 
 :root[data-theme="light"] {
@@ -130,6 +131,7 @@
 
   /* ── Misc ── */
   --badge-text: #1f1b16;
+  --button-text: #1f1b16;
 }
 
 /* ══════════════════════════════════════════
@@ -171,7 +173,7 @@ body {
   font-size: 0.65rem;
   letter-spacing: 0.3em;
   text-transform: uppercase;
-  color: var(--badge-text);
+  color: var(--button-text);
   font-weight: 600;
   background: var(--gold);
   border: none;
@@ -263,23 +265,25 @@ body {
 
 /* ── Logo ── */
 .site-logo {
-  font-family: 'Cinzel', serif;
-  font-weight: 400;
-  font-size: 1.5rem;
-  letter-spacing: 0.25em;
-  color: var(--gold);
-  text-transform: uppercase;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.85rem;
   text-decoration: none;
   cursor: pointer;
-  transition: color 0.3s;
   flex-shrink: 0;
 }
-.site-logo:hover { color: var(--gold-light); }
-.site-logo::after {
-  content: '·';
-  margin-left: 0.6em;
-  color: rgba(201,168,76,0.4);
-  font-size: 0.8em;
+.site-logo:hover .site-logo-mark,
+.site-logo:hover .site-logo-wordmark {
+  filter: brightness(1.08);
+}
+.site-logo-mark {
+  width: 42px;
+  height: auto;
+  filter: drop-shadow(0 8px 18px rgba(0, 0, 0, 0.22));
+}
+.site-logo-wordmark {
+  width: 168px;
+  height: auto;
 }
 
 /* ── Nav ── */
@@ -467,12 +471,16 @@ body {
   .site-header { padding: 0 2rem; }
   .site-nav     { display: none; }
   .hamburger    { display: flex; }
+  .site-logo-wordmark { width: 150px; }
 }
 @media (max-width: 480px) {
   .site-header { padding: 0 1.25rem; }
   .site-icons   { gap: 1rem; }
   .header-actions { gap: 0.6rem; }
   .theme-toggle { width: 28px; height: 28px; }
+  .site-logo { gap: 0.55rem; }
+  .site-logo-mark { width: 36px; }
+  .site-logo-wordmark { width: 124px; }
 }
 @media (max-width: 900px) {
   .theme-toggle { display: none; }
@@ -524,13 +532,13 @@ body {
 
 .footer-logo {
   display: inline-block;
-  font-family: 'Cinzel', serif;
-  font-weight: 400;
-  font-size: 1.1rem;
-  letter-spacing: 0.45em;
-  text-transform: uppercase;
-  color: var(--gold);
+  text-decoration: none;
   margin-bottom: 0.85rem;
+}
+.footer-logo-image {
+  width: min(220px, 100%);
+  height: auto;
+  filter: drop-shadow(0 16px 34px rgba(0, 0, 0, 0.24));
 }
 
 .footer-copy {
@@ -616,6 +624,7 @@ body {
 @media (max-width: 600px) {
   .site-footer { padding: 2.75rem 1.5rem 2.3rem; margin-top: 2rem; }
   .footer-cols { flex-wrap: wrap; gap: 2rem; }
+  .footer-logo-image { width: 190px; }
   .site-footer-bottom {
     flex-direction: column-reverse;
     align-items: flex-start;

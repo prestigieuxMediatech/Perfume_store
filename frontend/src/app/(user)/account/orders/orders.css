@@ -238,6 +238,11 @@
   background: var(--dark3);
   overflow: hidden;
 }
+.orders-item-link-cover {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
 .orders-item-img img {
   width: 100%;
   height: 100%;
@@ -258,6 +263,14 @@
 .orders-item-name {
   font-family: 'Cormorant Garamond', serif;
   font-size: 1.1rem;
+}
+.orders-item-link {
+  color: var(--cream);
+  text-decoration: none;
+  transition: color .3s ease;
+}
+.orders-item-link:hover {
+  color: var(--gold);
 }
 .orders-item-meta {
   font-family: 'Cinzel', serif;

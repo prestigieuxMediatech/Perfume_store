@@ -433,7 +433,7 @@
     .ah-cta-btn {
       position:relative; font-family:'Cinzel',serif;
       font-size:.65rem; letter-spacing:.35em; text-transform:uppercase;
-      color:var(--dark); background:var(--gold); border:none;
+      color:var(--button-text); background:var(--gold); border:none;
       padding:1.05rem 3.2rem; cursor:pointer; overflow:hidden; transition:background .35s;
     }
     .ah-cta-btn::after {

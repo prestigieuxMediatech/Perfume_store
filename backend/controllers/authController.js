@@ -164,6 +164,49 @@ const parseSelections = (value) => {
   }
 };
 
+const enrichBoxSelections = async (selections) => {
+  const parsedSelections = parseSelections(selections);
+  if (!parsedSelections.length) return [];
+
+  const enriched = await Promise.all(
+    parsedSelections.map(async (selection) => {
+      const productId = selection.product_id || null;
+      const variantId = selection.variant_id || null;
+
+      if (!productId || !variantId) {
+        return selection;
+      }
+
+      try {
+        const [rows] = await pool.query(
+          `SELECT p.id AS product_id, p.name, pv.id AS variant_id, pv.size
+           FROM products p
+           JOIN product_variants pv ON pv.product_id = p.id
+           WHERE p.id = ? AND pv.id = ?
+           LIMIT 1`,
+          [productId, variantId]
+        );
+
+        if (!rows.length) {
+          return selection;
+        }
+
+        return {
+          ...selection,
+          product_id: rows[0].product_id,
+          variant_id: rows[0].variant_id,
+          name: rows[0].name,
+          size: rows[0].size,
+        };
+      } catch {
+        return selection;
+      }
+    })
+  );
+
+  return enriched;
+};
+
 exports.googleCallback = (req,res) => {
     const token = buildUserToken(req.user);
     setAuthCookie(res, token, 'user');
@@ -391,6 +434,7 @@ exports.getCart = async (req, res) => {
         b.id AS box_id,
         b.name,
         b.description,
+        b.cover_image,
         b.price,
         cbi.selections_json
       FROM cart_box_items cbi
@@ -399,7 +443,16 @@ exports.getCart = async (req, res) => {
       ORDER BY cbi.created_at DESC
     `, [req.user.id]);
 
-    const combined = [...rows, ...boxRows].sort((a, b) => {
+    const enrichedBoxRows = await Promise.all(
+      boxRows.map(async (item) => ({
+        ...item,
+        selections_json: JSON.stringify(
+          await enrichBoxSelections(item.selections_json)
+        ),
+      }))
+    );
+
+    const combined = [...rows, ...enrichedBoxRows].sort((a, b) => {
       const da = new Date(a.created_at || 0).getTime();
       const db = new Date(b.created_at || 0).getTime();
       return db - da;
@@ -572,6 +625,8 @@ exports.addBoxToCart = async (req, res) => {
       }
     }
 
+    const enrichedSelections = await enrichBoxSelections(selectionsList);
+
     await pool.query(
       `INSERT INTO cart_box_items (id, user_id, box_id, quantity, selections_json, price)
        VALUES (UUID(), ?, ?, ?, ?, ?)`,
@@ -579,7 +634,7 @@ exports.addBoxToCart = async (req, res) => {
         req.user.id,
         box_id,
         Number(quantity) || 1,
-        JSON.stringify(selectionsList),
+        JSON.stringify(enrichedSelections),
         Number(boxes[0].price)
       ]
     );

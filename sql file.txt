@@ -39,6 +39,8 @@ CREATE TABLE products (
 	brand_id       VARCHAR(36)  DEFAULT NULL,
 	group_name     VARCHAR(255) DEFAULT NULL,
 	details_json   LONGTEXT     DEFAULT NULL,
+	show_on_home   BOOLEAN      DEFAULT FALSE,
+	home_display_order INT      DEFAULT NULL,
   	is_active      BOOLEAN      DEFAULT TRUE,
   	created_at     DATETIME     DEFAULT NOW(),
   	updated_at     DATETIME     DEFAULT NOW() ON UPDATE NOW(),

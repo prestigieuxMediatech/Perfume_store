@@ -303,7 +303,7 @@
   letter-spacing: .2em;
   text-transform: uppercase;
   background: var(--gold);
-  color: var(--dark);
+  color: var(--button-text);
   border: none;
   padding: .75rem .5rem;
   cursor: pointer;
@@ -396,7 +396,7 @@
   z-index: 0;
 }
 .wl-browse-btn:hover::before { transform: scaleX(1); }
-.wl-browse-btn:hover { color: var(--dark); }
+.wl-browse-btn:hover { color: var(--button-text); }
 .wl-browse-btn span, .wl-browse-btn { position: relative; z-index: 1; }
 
 /* ══ SKELETON ══ */

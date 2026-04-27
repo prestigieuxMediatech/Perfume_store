@@ -340,6 +340,37 @@ export default function AddProduct() {
           </select>
         </div>
 
+        {false && (
+        <div style={{ marginBottom:"1.8rem", padding:"1rem", border:"1px solid #2a2418", background:"#0f0d0b" }}>
+          <label className="ad-label" style={{ display:"flex", alignItems:"center", gap:"0.75rem", cursor:"pointer" }}>
+            <input
+              type="checkbox"
+              name="show_on_home"
+              checked={form.show_on_home}
+              onChange={handleChange}
+            />
+            Display on home page
+          </label>
+          <p style={{ color:"#7A7264", fontSize:"0.68rem", marginTop:"0.4rem" }}>
+            Checked products are used in both the hero and collection sections.
+          </p>
+          {form.show_on_home && (
+            <div style={{ marginTop:"1rem" }}>
+              <label className="ad-label">Home Display Order</label>
+              <input
+                className="ad-input"
+                type="number"
+                min="1"
+                name="home_display_order"
+                placeholder="1 = featured, then 2, 3, 4"
+                value={form.home_display_order}
+                onChange={handleChange}
+              />
+            </div>
+          )}
+        </div>
+        )}
+
         {/* Brand — only shows after category is selected */}
         <div style={{ marginBottom:"1.8rem" }}>
           <label className="ad-label">

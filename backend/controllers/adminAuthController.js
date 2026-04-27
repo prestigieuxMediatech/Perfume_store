@@ -17,6 +17,21 @@ const slugifyGroup = (value) => {
     .replace(/(^-|-$)/g, '');
 };
 
+const parseBooleanInput = (value) => {
+  if (typeof value === 'boolean') return value;
+  if (typeof value === 'number') return value === 1;
+  if (typeof value !== 'string') return false;
+
+  const normalized = value.trim().toLowerCase();
+  return ['1', 'true', 'yes', 'on'].includes(normalized);
+};
+
+const parseNullableOrder = (value) => {
+  if (value === undefined || value === null || value === '') return null;
+  const parsed = Number.parseInt(value, 10);
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : null;
+};
+
 exports.login = async (req, res) => {
     try {
         const { email, password } = req.body;
@@ -317,7 +332,17 @@ exports.deleteBrand = async (req, res) => {
 
 exports.addProduct = async (req, res) => {
   try {
-    const { name, description, category_id, brand_id, variants, group_name, details_json } = req.body;
+    const {
+      name,
+      description,
+      category_id,
+      brand_id,
+      variants,
+      group_name,
+      details_json,
+      show_on_home,
+      home_display_order,
+    } = req.body;
 
     // Validation
     if (!name) {
@@ -355,10 +380,24 @@ exports.addProduct = async (req, res) => {
     const productId = require('crypto').randomUUID();
     const finalGroupName = group_name ? group_name.trim() : slugifyGroup(name);
     const productDetails = stringifyProductDetails(parseProductDetails(details_json));
+    const shouldShowOnHome = parseBooleanInput(show_on_home);
+    const homeDisplayOrder = shouldShowOnHome ? parseNullableOrder(home_display_order) : null;
     await pool.query(
-      `INSERT INTO products (id, name, description, category_id, brand_id, group_name, details_json)
-      VALUES (?, ?, ?, ?, ?, ?, ?)`,
-      [productId, name, description || null, category_id || null, brand_id || null, finalGroupName || null, productDetails]
+      `INSERT INTO products (
+        id, name, description, category_id, brand_id, group_name, details_json, show_on_home, home_display_order
+      )
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [
+        productId,
+        name,
+        description || null,
+        category_id || null,
+        brand_id || null,
+        finalGroupName || null,
+        productDetails,
+        shouldShowOnHome,
+        homeDisplayOrder,
+      ]
     );
 
     // Insert variants
@@ -399,6 +438,8 @@ exports.getProducts = async (req, res) => {
         p.group_name,
         p.details_json,
         p.is_active,
+        p.show_on_home,
+        p.home_display_order,
         p.created_at,
         c.name       AS category_name,
         b.name AS brand_name,
@@ -472,11 +513,55 @@ exports.getProductById = async (req, res) => {
   }
 };
 
+exports.updateProductHomeDisplay = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { show_on_home, home_display_order } = req.body;
+
+    const [existing] = await pool.query(
+      `SELECT id FROM products WHERE id = ?`,
+      [id]
+    );
+
+    if (existing.length === 0) {
+      return res.status(404).json({ message: 'Product not found' });
+    }
+
+    const shouldShowOnHome = parseBooleanInput(show_on_home);
+    const homeDisplayOrder = shouldShowOnHome ? parseNullableOrder(home_display_order) : null;
+
+    await pool.query(
+      `
+        UPDATE products
+        SET show_on_home = ?, home_display_order = ?
+        WHERE id = ?
+      `,
+      [shouldShowOnHome, homeDisplayOrder, id]
+    );
+
+    res.status(200).json({ message: 'Home display updated successfully' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
 // PUT /api/admin/products/:id
 exports.updateProduct = async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, description, category_id, brand_id, variants, remove_images, group_name, details_json } = req.body;
+    const {
+      name,
+      description,
+      category_id,
+      brand_id,
+      variants,
+      remove_images,
+      group_name,
+      details_json,
+      show_on_home,
+      home_display_order,
+    } = req.body;
 
     if (!name) {
       return res.status(400).json({ message: 'Product name is required' });
@@ -493,11 +578,31 @@ exports.updateProduct = async (req, res) => {
     // Update product
     const finalGroupName = group_name ? group_name.trim() : slugifyGroup(name);
     const productDetails = stringifyProductDetails(parseProductDetails(details_json));
+    const shouldShowOnHome = parseBooleanInput(show_on_home);
+    const homeDisplayOrder = shouldShowOnHome ? parseNullableOrder(home_display_order) : null;
     await pool.query(`
       UPDATE products
-      SET name = ?, description = ?, category_id = ?, brand_id = ?, group_name = ?, details_json = ?
+      SET
+        name = ?,
+        description = ?,
+        category_id = ?,
+        brand_id = ?,
+        group_name = ?,
+        details_json = ?,
+        show_on_home = ?,
+        home_display_order = ?
       WHERE id = ?
-    `, [name, description || null, category_id || null, brand_id || null, finalGroupName || null, productDetails, id]);
+    `, [
+      name,
+      description || null,
+      category_id || null,
+      brand_id || null,
+      finalGroupName || null,
+      productDetails,
+      shouldShowOnHome,
+      homeDisplayOrder,
+      id,
+    ]);
 
     // Replace variants — delete old ones and insert new
     if (variants) {

@@ -3,6 +3,7 @@ CREATE TABLE IF NOT EXISTS boxes (
   id           VARCHAR(36)  PRIMARY KEY,
   name         VARCHAR(200) NOT NULL,
   description  TEXT,
+  cover_image  VARCHAR(255) DEFAULT NULL,
   price        DECIMAL(10,2) NOT NULL,
   items_count  INT NOT NULL,
   is_active    BOOLEAN DEFAULT TRUE,

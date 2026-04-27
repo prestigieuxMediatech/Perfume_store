@@ -272,8 +272,10 @@ exports.getMyOrders = async (req, res) => {
         obd.quantity,
         obd.unit_price,
         obd.line_total,
-        obd.selections_json
+        obd.selections_json,
+        b.cover_image
       FROM order_box_details obd
+      LEFT JOIN boxes b ON obd.box_id = b.id
       WHERE obd.order_id IN (?)
       ORDER BY obd.id ASC
     `, [orderIds]);
@@ -420,8 +422,10 @@ exports.getAdminOrderById = async (req, res) => {
         obd.line_total,
         obd.box_id,
         obd.box_name,
-        obd.selections_json
+        obd.selections_json,
+        b.cover_image
       FROM order_box_details obd
+      LEFT JOIN boxes b ON obd.box_id = b.id
       WHERE obd.order_id = ?
       ORDER BY obd.id ASC
     `, [id]);

@@ -265,7 +265,7 @@ export default function Brands() {
               <input
                 className="ad-input"
                 type="text"
-                placeholder="e.g. Maison Margiela"
+                placeholder="e.g. SEVENEVEN Margiela"
                 value={form.name}
                 onChange={handleNameChange}
                 autoFocus
@@ -283,7 +283,7 @@ export default function Brands() {
               <input
                 className="ad-input"
                 type="text"
-                placeholder="e.g. maison-margiela"
+                placeholder="e.g. SEVENEVEN-margiela"
                 value={form.slug}
                 onChange={e => setForm({ ...form, slug: e.target.value })}
               />
