@@ -9,23 +9,48 @@ const path = require('path');
 
 const db = require('./config/db');
 
+const parseAllowedOrigins = () => {
+  const configured = String(process.env.FRONTEND_URL || '')
+    .split(',')
+    .map((value) => value.trim())
+    .filter(Boolean);
+
+  const defaults = [
+    'http://localhost:3000',
+    'http://127.0.0.1:3000',
+    'https://perfume-store-two.vercel.app'
+  ];
+
+  return Array.from(new Set([...configured, ...defaults]));
+};
+
+const allowedOrigins = parseAllowedOrigins();
+
 
 app.use(helmet({
   contentSecurityPolicy: false,
   crossOriginResourcePolicy: { policy: "cross-origin" }
 }));
 app.use(cors({
-  origin:      process.env.FRONTEND_URL,
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+
+    return callback(new Error(`Origin ${origin} not allowed by CORS`));
+  },
   credentials: true
 }));
 app.use(express.json());
 app.use(passport.initialize());
 
 app.use('/uploads', (req, res, next) => {
-  if (process.env.FRONTEND_URL) {
-    res.setHeader('Access-Control-Allow-Origin', process.env.FRONTEND_URL);
+  const requestOrigin = req.headers.origin;
+  if (requestOrigin && allowedOrigins.includes(requestOrigin)) {
+    res.setHeader('Access-Control-Allow-Origin', requestOrigin);
   }
   res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
+  res.setHeader('Vary', 'Origin');
   next();
 });
 
